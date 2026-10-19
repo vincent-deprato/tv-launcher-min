@@ -4,7 +4,7 @@
 
 > A lightweight, remote-friendly Android TV launcher based on [CleanYourTV](https://github.com/Gathin23/cleanyourtv) / TV-VibeHack. This is a community fork, not an official Sony or Android product.
 
-![TV-Launcher running on a Sony Bravia](docs/images/tv-launcher-sony.jpg)
+![TV-Launcher running on a Sony Bravia](docs/images/tv-launcher-sony.png)
 
 ## Français
 
