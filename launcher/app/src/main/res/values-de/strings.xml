@@ -19,6 +19,4 @@
     <string name="not_available">Auf diesem TV nicht verfügbar</string>
     <string name="cant_open">%1$s lässt sich nicht öffnen</string>
     <string name="date_format">EEEE, d. MMMM</string>
-    <string name="dream_name">Uhr</string>
-    <string name="input_key_service_description">Öffnet die Quellenauswahl, wenn die Input-Taste der Fernbedienung gedrückt wird.</string>
 </resources>

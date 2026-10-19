@@ -3,25 +3,30 @@ package com.gathin.tvhome;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.provider.Settings;
-import android.util.DisplayMetrics;
 import android.view.KeyEvent;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
-import android.view.animation.DecelerateInterpolator;
+import android.view.Gravity;
+import android.util.TypedValue;
 import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,132 +38,96 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
- * App tiles. The first {@link MainActivity#COLUMNS} positions are the pinned dock (favourites, fixed order),
- * then the module cards the owner chose to show (by label), the rest is alphabetical.
+ * App tiles. The first {@link MainActivity#COLUMNS} positions are editable favourites,
+ * the rest is alphabetical.
  */
 public class AppAdapter extends RecyclerView.Adapter<AppAdapter.Holder> {
 
     interface TileListener {
         void onTileFocused(int position, View card);
 
-        /** Called for a D-pad direction key on a tile. Return true when handled (focus stays put). */
+        /** Called for D-pad Up/Down on a tile. Return true when handled. */
         boolean onTileVerticalKey(int position, int keyCode);
+        void onFavouritesReordered(String packageName, int position);
     }
 
     static final class Entry {
-        static final int APP = 0, HOME_SETTINGS = 1, CARD = 2;
-
-        final int kind;
         final String label;
         final ComponentName component;
         final String pkg;
         final Drawable banner;
         final Drawable icon;
-        /** Text under the tile when it is focused in the grid: the label, plus the caption for a card. */
-        final String name;
-        /** Ambient glow colour; 0 until sampled from the banner, or the card's accent from the start. */
         int ambient;
 
         Entry(String label, ComponentName component, Drawable banner, Drawable icon) {
-            this(APP, label, component, banner, icon, null, 0);
-        }
-
-        Entry(int kind, String label, ComponentName component, Drawable banner, Drawable icon, String caption, int accent) {
-            this.kind = kind;
             this.label = label;
             this.component = component;
             this.pkg = component.getPackageName();
             this.banner = banner;
             this.icon = icon;
-            this.name = caption == null ? label : label + " \u00B7 " + caption;
-            this.ambient = accent;
         }
     }
 
     static final float FOCUS_SCALE = 1.10f;
-    /** Design size of a tile (dp); tiles shrink from here when the columns don't fit, see tileWidthPx. */
-    static final float DESIGN_W_DP = 180f, DESIGN_H_DP = 101f;
-
-    /**
-     * Tile width for a grid of this inner width: the cell minus room for the focus zoom and the glass
-     * highlight, capped at the design size so 4 columns on a 1080p TV look exactly as before.
-     */
-    static int tileWidthPx(int innerWidthPx, int columns, float density) {
-        int design = Math.round(DESIGN_W_DP * density);
-        if (innerWidthPx <= 0 || columns <= 0) return design;
-        int cell = innerWidthPx / columns;
-        int fit = (int) ((cell - 12 * density) / FOCUS_SCALE);
-        return Math.max(Math.round(80 * density), Math.min(design, fit));
-    }
-
-    static int tileHeightPx(int tileWidthPx) {
-        return Math.round(tileWidthPx * DESIGN_H_DP / DESIGN_W_DP);
-    }
-
-    /** Height of one grid item: the tile, the name label under it and the item's own padding. */
-    static int itemHeightPx(int tileHeightPx, float density) {
-        return tileHeightPx + Math.round(45 * density);
-    }
 
     private final Context ctx;
     private final TileListener listener;
     private final int dockSize;
-    /** Dock order (config.xml dock_apps, or a theme's config.json). */
+    /** Dock order (res/values/config.xml, dock_apps). */
     private final List<String> favourites;
+    private static final String PREFS = "dock_preferences";
+    private static final String ORDER_KEY = "favourites_order_v1";
     /** Never shown as tiles (res/values/config.xml, hidden_apps). */
     private final Set<String> hidden;
-    private final boolean showHomeSettings;
-    /** Calmer motion for weak GPUs (config.xml, reduced_motion): no overshoot, shorter fades. */
-    private final boolean reducedMotion;
+    private final List<String> customOrder = new ArrayList<>();
+    private static final String HIDDEN_KEY = "hidden_apps_v4";
+    private static final String GRID_KEY = "grid_order_v4";
     private final List<Entry> items = new ArrayList<>();
 
-    AppAdapter(Context ctx, TileListener listener, int dockSize, Config cfg) {
+    AppAdapter(Context ctx, TileListener listener, int dockSize) {
         this.ctx = ctx;
         this.listener = listener;
         this.dockSize = dockSize;
-        this.favourites = cfg.dockApps;
-        this.hidden = new HashSet<>(cfg.hiddenApps);
-        this.showHomeSettings = cfg.showHomeSettingsShortcut;
-        this.reducedMotion = cfg.reducedMotion;
+        this.favourites = new ArrayList<>(Arrays.asList(ctx.getResources().getStringArray(R.array.dock_apps)));
+        String stored = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(ORDER_KEY, "");
+        if (!stored.isEmpty()) {
+            List<String> saved = Arrays.asList(stored.split("\\|"));
+            List<String> merged = new ArrayList<>();
+            for (String pkg : saved) if (!pkg.isEmpty() && !merged.contains(pkg)) merged.add(pkg);
+            for (String pkg : favourites) if (!merged.contains(pkg)) merged.add(pkg);
+            favourites.clear();
+            favourites.addAll(merged);
+        }
+        this.hidden = new HashSet<>(Arrays.asList(ctx.getResources().getStringArray(R.array.hidden_apps)));
+        android.content.SharedPreferences prefs = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        String hiddenSaved = prefs.getString(HIDDEN_KEY, "");
+        if (!hiddenSaved.isEmpty()) hidden.addAll(Arrays.asList(hiddenSaved.split("\\|")));
+        String gridSaved = prefs.getString(GRID_KEY, "");
+        if (!gridSaved.isEmpty()) for (String pkg : gridSaved.split("\\|")) if (!pkg.isEmpty() && !customOrder.contains(pkg)) customOrder.add(pkg);
         // Tiles keep their identity across reload(), so a focused tile stays on its app instead of
         // its view being rebound to whatever app now sits in that slot.
         setHasStableIds(true);
     }
 
-    /**
-     * Rebuilds the tiles. A shown module card stands in for every tile of its package (same component,
-     * so focus follows it); hidden_apps wins over a card, and a card's package in dock_apps takes that slot.
-     */
-    void reload(List<Cards.Card> cards) {
+    void reload() {
         PackageManager pm = ctx.getPackageManager();
         Intent probe = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER);
         List<ResolveInfo> found = pm.queryIntentActivities(probe, 0);
-        Map<String, Cards.Card> cardByPkg = new HashMap<>();
-        for (Cards.Card c : cards) cardByPkg.put(c.pkg, c);
         List<Entry> fresh = new ArrayList<>();
         for (ResolveInfo ri : found) {
             if (ri.activityInfo == null) continue;
             String pkg = ri.activityInfo.packageName;
             if (pkg.equals(ctx.getPackageName()) || hidden.contains(pkg)) continue;
-            ComponentName component = new ComponentName(pkg, ri.activityInfo.name);
-            Cards.Card card = cardByPkg.get(pkg);
-            if (card != null && !card.component.equals(component)) continue;   // the card stands in for this tile
-            Drawable banner = loadBanner(pm, ri);
+            Drawable banner = ri.activityInfo.loadBanner(pm);
+            if (banner == null) banner = ri.activityInfo.applicationInfo.loadBanner(pm);
             Drawable icon = ri.loadIcon(pm);
-            if (card != null) {
-                fresh.add(new Entry(Entry.CARD, card.label, component, banner, icon, card.caption, card.accent));
-            } else {
-                // Same cleaner as the card prompt: an app label with a bidi override or line separator must not
-                // redraw the tile name as something else (#117).
-                fresh.add(new Entry(Cards.cleanLabel(String.valueOf(ri.loadLabel(pm)), pkg), component, banner, icon));
-            }
+            String label = String.valueOf(ri.loadLabel(pm));
+            fresh.add(new Entry(label, new ComponentName(pkg, ri.activityInfo.name), banner, icon));
         }
         Collections.sort(fresh, (a, b) -> {
             int fa = favourites.indexOf(a.pkg), fb = favourites.indexOf(b.pkg);
@@ -167,63 +136,49 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.Holder> {
                 if (fb < 0) return -1;
                 return Integer.compare(fa, fb);
             }
-            // Cards come right after the configured dock apps, before the alphabetical grid.
-            boolean ca = a.kind == Entry.CARD, cb = b.kind == Entry.CARD;
-            if (ca != cb) return ca ? -1 : 1;
+            int ia = customOrder.indexOf(a.pkg), ib = customOrder.indexOf(b.pkg);
+            if (ia >= 0 || ib >= 0) {
+                if (ia < 0) return 1;
+                if (ib < 0) return -1;
+                return Integer.compare(ia, ib);
+            }
             return a.label.compareToIgnoreCase(b.label);
         });
-        // Optional "Default home" tile (config.xml), only when this TV actually has a home-screen picker.
-        if (showHomeSettings
-                && pm.resolveActivity(new Intent(Settings.ACTION_HOME_SETTINGS), 0) != null) {
-            fresh.add(new Entry(Entry.HOME_SETTINGS, ctx.getString(R.string.home_settings),
-                    new ComponentName(ctx, HomeSettingsActivity.class), null,
-                    ctx.getDrawable(R.drawable.ic_home_settings), null, 0));
-        }
         items.clear();
         items.addAll(fresh);
         notifyDataSetChanged();
-    }
-
-    private Drawable loadBanner(PackageManager pm, ResolveInfo ri) {
-        int id = ri.activityInfo.banner;
-        if (id == 0) id = ri.activityInfo.applicationInfo.banner;
-        if (id != 0) {
-            try {
-                Resources resources = pm.getResourcesForApplication(ri.activityInfo.applicationInfo);
-                // Keep at least xhdpi detail rather than downsampling artwork before the focus zoom.
-                int density = Math.max(DisplayMetrics.DENSITY_XHIGH, ctx.getResources().getDisplayMetrics().densityDpi);
-                return resources.getDrawableForDensity(id, density, null);
-            } catch (PackageManager.NameNotFoundException | Resources.NotFoundException ignored) {
-            }
-        }
-        return ri.activityInfo.loadBanner(pm);
     }
 
     @NonNull
     @Override
     public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_app, parent, false);
-        float density = parent.getResources().getDisplayMetrics().density;
-        int width = parent.getWidth() > 0 ? parent.getWidth() : parent.getMeasuredWidth();
-        int inner = width - parent.getPaddingLeft() - parent.getPaddingRight();
-        int w = tileWidthPx(inner, dockSize, density), h = tileHeightPx(w);
-        View card = v.findViewById(R.id.card);
-        ViewGroup.LayoutParams cardLp = card.getLayoutParams();
-        cardLp.width = w;
-        cardLp.height = h;
-        card.setLayoutParams(cardLp);
-        View name = v.findViewById(R.id.name);
-        ViewGroup.MarginLayoutParams nameLp = (ViewGroup.MarginLayoutParams) name.getLayoutParams();
-        nameLp.width = w;
-        nameLp.topMargin = h + Math.round(7 * density);
-        name.setLayoutParams(nameLp);
-        return new Holder(v, listener, reducedMotion);
+        // Each tile must fit its grid cell, including breathing room for the focus zoom.
+        // The root layout has 56dp horizontal padding on either side (activity_main.xml).
+        float density = ctx.getResources().getDisplayMetrics().density;
+        float screenDp = ctx.getResources().getDisplayMetrics().widthPixels / density;
+        float usableDp = Math.max(0f, screenDp - 112f);
+        int tileDp = Math.max(64, Math.min(180, (int) (usableDp / dockSize) - 18));
+        int tileHeightDp = Math.round(tileDp * 101f / 180f);
+        FrameLayout.LayoutParams cardParams = (FrameLayout.LayoutParams) v.findViewById(R.id.card).getLayoutParams();
+        cardParams.width = Math.round(tileDp * density);
+        cardParams.height = Math.round(tileHeightDp * density);
+        v.findViewById(R.id.card).setLayoutParams(cardParams);
+        FrameLayout.LayoutParams nameParams = (FrameLayout.LayoutParams) v.findViewById(R.id.name).getLayoutParams();
+        nameParams.width = Math.round(tileDp * density);
+        nameParams.topMargin = Math.round((tileHeightDp + 7) * density);
+        v.findViewById(R.id.name).setLayoutParams(nameParams);
+        return new Holder(v, listener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull Holder h, int position) {
         Entry e = items.get(position);
-        h.name.setText(e.name);
+        if (h.pendingLongPress != null) h.card.removeCallbacks(h.pendingLongPress);
+        h.pendingLongPress = null;
+        h.keyHeld = false;
+        h.longTriggered = false;
+        h.name.setText(e.label);
         h.name.setVisibility(position < dockSize ? View.INVISIBLE : View.VISIBLE);   // the dock has no labels
         boolean focused = h.card.isFocused();   // a rebind after reload() can hit the focused tile
         h.name.setAlpha(focused ? 1f : 0f);
@@ -242,25 +197,268 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.Holder> {
             h.label.setText(e.label);
             h.label.setVisibility(View.VISIBLE);
         }
+        // Some Android TV remotes do not dispatch View long-click for DPAD_CENTER.
+        // Handle the actual key-down/key-up sequence, plus MENU as an alternative.
+        h.card.setOnKeyListener((view, keyCode, event) -> {
+            int current = h.getBindingAdapterPosition();
+            if (current == RecyclerView.NO_POSITION) return false;
+            if (keyCode == KeyEvent.KEYCODE_DPAD_UP || keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+                return event.getAction() == KeyEvent.ACTION_DOWN
+                        && listener != null && listener.onTileVerticalKey(current, keyCode);
+            }
+            if (keyCode == KeyEvent.KEYCODE_MENU && current < dockSize) {
+                if (event.getAction() == KeyEvent.ACTION_UP) showFavouriteActions(current);
+                return true;
+            }
+            // Let Android TV handle OK/Enter normally so long-press opens app settings again.
+            return false;
+        });
         h.card.setOnClickListener(v -> launch(e));
         h.card.setOnLongClickListener(v -> {
             Intent i = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + e.pkg));
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            try {
-                ctx.startActivity(i);
-            } catch (ActivityNotFoundException ignored) {
-            }
+            try { ctx.startActivity(i); } catch (ActivityNotFoundException ignored) { }
             return true;
         });
     }
 
-    /** Opens the tile's activity by explicit component, with no extras: a card can name nothing else. */
-    private void launch(Entry e) {
-        if (e.kind == Entry.HOME_SETTINGS) {
-            ctx.startActivity(new Intent(ctx, HomeSettingsActivity.class)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+    /** Entry point for the visible Manage favourites button, accessible by remote. */
+    void showFavouritesManager() {
+        int count = Math.min(dockSize, items.size());
+        if (count == 0) {
+            Toast.makeText(ctx, R.string.no_favourites, Toast.LENGTH_SHORT).show();
             return;
         }
+        String[] choices = new String[count];
+        for (int i = 0; i < count; i++) {
+            choices[i] = (i + 1) + " - " + items.get(i).label;
+        }
+        showGlassMenu(ctx.getString(R.string.manage_favourites), choices, -1,
+                which -> showFavouriteActions(which), null);
+    }
+
+    /** Long OK on a favourite: reorder it or replace it with an installed application. */
+    private void showFavouriteActions(int source) {
+        if (source < 0 || source >= Math.min(dockSize, items.size())) return;
+        String appLabel = items.get(source).label;
+        showGlassMenu(ctx.getString(R.string.favourite_title, appLabel, source + 1),
+                new String[]{ctx.getString(R.string.favourite_change_position), ctx.getString(R.string.favourite_replace)},
+                -1, choice -> {
+                    if (choice == 0) showPositionDialog(source);
+                    else showReplacementDialog(source);
+                }, null);
+    }
+
+    /** Show the TV apps already listed by the launcher, excluding current dock apps. */
+    private void showReplacementDialog(int source) {
+        int count = Math.min(dockSize, items.size());
+        if (source < 0 || source >= count) return;
+        List<Entry> candidates = new ArrayList<>();
+        Set<String> pinned = new HashSet<>();
+        for (int i = 0; i < count; i++) pinned.add(items.get(i).pkg);
+        Set<String> added = new HashSet<>();
+        for (Entry entry : items) {
+            if (!pinned.contains(entry.pkg) && added.add(entry.pkg)) candidates.add(entry);
+        }
+        if (candidates.isEmpty()) {
+            Toast.makeText(ctx, R.string.no_other_apps, Toast.LENGTH_LONG).show();
+            return;
+        }
+        Collections.sort(candidates, (a, b) -> a.label.compareToIgnoreCase(b.label));
+        String[] choices = new String[candidates.size()];
+        for (int i = 0; i < candidates.size(); i++) choices[i] = candidates.get(i).label;
+        showGlassMenu(ctx.getString(R.string.replace_title, items.get(source).label),
+                choices, -1, selected -> {
+                    Entry replacement = candidates.get(selected);
+                    List<String> updated = new ArrayList<>();
+                    for (int i = 0; i < count; i++) {
+                        updated.add(i == source ? replacement.pkg : items.get(i).pkg);
+                    }
+                    // Do not leave the removed app in the favourites: it returns to the normal grid.
+                    // Retain unavailable favourites only if there is still a free dock slot.
+                    String oldPkg = items.get(source).pkg;
+                    for (String pkg : favourites) {
+                        if (updated.size() >= dockSize) break;
+                        if (!pkg.equals(oldPkg) && !updated.contains(pkg)) updated.add(pkg);
+                    }
+                    favourites.clear();
+                    favourites.addAll(updated);
+                    saveFavourites();
+                    reload();
+                    if (listener != null) listener.onFavouritesReordered(replacement.pkg, source);
+                    Toast.makeText(ctx, ctx.getString(R.string.favourite_added, replacement.label), Toast.LENGTH_SHORT).show();
+                }, () -> showFavouriteActions(source));
+    }
+
+    /** Manage the normal grid using the same compact remote-friendly menu as favourites. */
+    void showGridManager() {
+        List<Entry> normal = normalGridEntries();
+        String[] labels = new String[normal.size() + 1];
+        String[] icons = new String[labels.length];
+        labels[0] = "Applications masquées";
+        icons[0] = "◉";
+        for (int i = 0; i < normal.size(); i++) {
+            labels[i + 1] = (i + 1) + " · " + normal.get(i).label;
+            icons[i + 1] = "▦";
+        }
+        CompactMenu.show(ctx, "Organiser les applications", labels, icons, -1,
+            chosen -> {
+                if (chosen == 0) showHiddenManager();
+                else showGridActions(normal.get(chosen - 1).pkg);
+            }, null);
+    }
+
+    private List<Entry> normalGridEntries() {
+        List<Entry> normal = new ArrayList<>();
+        for (int i = Math.min(dockSize, items.size()); i < items.size(); i++) normal.add(items.get(i));
+        return normal;
+    }
+
+    private void showGridActions(String pkg) {
+        Entry selected = null;
+        for (Entry entry : normalGridEntries()) if (entry.pkg.equals(pkg)) { selected = entry; break; }
+        if (selected == null) return;
+        final String label = selected.label;
+        CompactMenu.show(ctx, label,
+            new String[]{"Déplacer dans la grille", "Masquer de l'accueil"},
+            new String[]{"↕", "⊘"}, -1, choice -> {
+                if (choice == 0) showGridPositions(pkg);
+                else new AlertDialog.Builder(ctx)
+                    .setTitle("Masquer " + label + " ?")
+                    .setMessage("L'application restera installée sur la TV.")
+                    .setPositiveButton("Masquer", (d, w) -> {
+                        hidden.add(pkg);
+                        persistGrid();
+                        reload();
+                        Toast.makeText(ctx, label + " masquée", Toast.LENGTH_SHORT).show();
+                    })
+                    .setNegativeButton("Annuler", null).show();
+            }, this::showGridManager);
+    }
+
+    private void showGridPositions(String pkg) {
+        List<Entry> normal = normalGridEntries();
+        int original = -1;
+        String name = pkg;
+        for (int i = 0; i < normal.size(); i++) {
+            if (normal.get(i).pkg.equals(pkg)) { original = i; name = normal.get(i).label; break; }
+        }
+        if (original < 0) return;
+        String[] labels = new String[normal.size()];
+        for (int i = 0; i < normal.size(); i++) labels[i] = (i + 1) + " · " + normal.get(i).label;
+        final String selectedLabel = name;
+        CompactMenu.show(ctx, "Nouvelle position · " + name, labels, null, original,
+            target -> {
+                List<String> order = new ArrayList<>();
+                for (Entry entry : normal) if (!entry.pkg.equals(pkg) && !order.contains(entry.pkg)) order.add(entry.pkg);
+                order.add(Math.min(target, order.size()), pkg);
+                customOrder.clear();
+                customOrder.addAll(order);
+                persistGrid();
+                reload();
+                Toast.makeText(ctx, selectedLabel + " déplacée", Toast.LENGTH_SHORT).show();
+            }, () -> showGridActions(pkg));
+    }
+
+    private void showHiddenManager() {
+        List<Entry> candidates = allLaunchableHidden();
+        if (candidates.isEmpty()) {
+            Toast.makeText(ctx, "Aucune application masquée", Toast.LENGTH_SHORT).show();
+            showGridManager();
+            return;
+        }
+        String[] labels = new String[candidates.size()];
+        for (int i = 0; i < candidates.size(); i++) labels[i] = candidates.get(i).label;
+        CompactMenu.show(ctx, "Réafficher une application", labels, null, -1,
+            index -> {
+                Entry entry = candidates.get(index);
+                hidden.remove(entry.pkg);
+                persistGrid();
+                reload();
+                Toast.makeText(ctx, entry.label + " réaffichée", Toast.LENGTH_SHORT).show();
+            }, this::showGridManager);
+    }
+
+    private List<Entry> allLaunchableHidden() {
+        List<Entry> result = new ArrayList<>();
+        PackageManager pm = ctx.getPackageManager();
+        Intent query = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER);
+        Set<String> seen = new HashSet<>();
+        for (ResolveInfo ri : pm.queryIntentActivities(query,0)) {
+            if (ri.activityInfo == null) continue;
+            String pkg = ri.activityInfo.packageName;
+            if (!hidden.contains(pkg) || !seen.add(pkg)) continue;
+            result.add(new Entry(String.valueOf(ri.loadLabel(pm)),
+                new ComponentName(pkg,ri.activityInfo.name),null,ri.loadIcon(pm)));
+        }
+        Collections.sort(result,(a,b) -> a.label.compareToIgnoreCase(b.label));
+        return result;
+    }
+
+    private void persistGrid() {
+        // Only mutable hiding is exported, so permanently hidden configuration entries stay hidden.
+        Set<String> base = new HashSet<>(Arrays.asList(ctx.getResources().getStringArray(R.array.hidden_apps)));
+        Set<String> extra = new HashSet<>(hidden); extra.removeAll(base);
+        ctx.getSharedPreferences(PREFS,Context.MODE_PRIVATE).edit()
+            .putString(HIDDEN_KEY,android.text.TextUtils.join("|",extra))
+            .putString(GRID_KEY,android.text.TextUtils.join("|",customOrder)).apply();
+    }
+
+    private void saveFavourites() {
+        ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+                .putString(ORDER_KEY, android.text.TextUtils.join("|", favourites)).apply();
+    }
+
+    /** Long OK on a dock tile: choose a destination. Swaps with that slot. */
+    private void showPositionDialog(int source) {
+        int count = Math.min(dockSize, items.size());
+        if (source < 0 || source >= count) return;
+        String selectedPkg = items.get(source).pkg;
+        String selectedLabel = items.get(source).label;
+        String[] choices = new String[count];
+        for (int i = 0; i < count; i++) {
+            choices[i] = (i + 1) + " - " + items.get(i).label;
+            if (i == source) choices[i] += ctx.getString(R.string.position_current);
+        }
+        showGlassMenu(ctx.getString(R.string.position_title, selectedLabel), choices, source,
+                destination -> {
+                    if (destination == source) return;
+                    String targetPkg = items.get(destination).pkg;
+                    // Reconstruct the visible order before swapping. This also works if a configured
+                    // favourite is not installed (such entries are preserved after the visible apps).
+                    List<String> updated = new ArrayList<>();
+                    for (int i = 0; i < count; i++) updated.add(items.get(i).pkg);
+                    Collections.swap(updated, source, destination);
+                    for (String pkg : favourites) if (!updated.contains(pkg)) updated.add(pkg);
+                    favourites.clear();
+                    favourites.addAll(updated);
+                    saveFavourites();
+                    reload();
+                    // Keep focus on the moved app in its new location after the RecyclerView rebind.
+                    if (listener != null) listener.onFavouritesReordered(selectedPkg, destination);
+                    Toast.makeText(ctx, ctx.getString(R.string.position_changed, selectedLabel, destination + 1), Toast.LENGTH_SHORT).show();
+                }, null);
+    }
+
+    private int dp(float value) {
+        return (int) (value * ctx.getResources().getDisplayMetrics().density + 0.5f);
+    }
+
+    private GradientDrawable rounded(int color, int stroke) {
+        GradientDrawable shape = new GradientDrawable();
+        shape.setColor(color);
+        shape.setCornerRadius(dp(17));
+        if (stroke != 0) shape.setStroke(dp(1), stroke);
+        return shape;
+    }
+
+    /** Same compact visual component as the integrated launcher settings. */
+    private void showGlassMenu(String title, String[] choices, int current,
+                               java.util.function.IntConsumer onSelect, Runnable onBack) {
+        CompactMenu.show(ctx, title, choices, null, current, onSelect, onBack);
+    }
+
+    private void launch(Entry e) {
         Intent i = new Intent(Intent.ACTION_MAIN)
                 .addCategory(Intent.CATEGORY_LEANBACK_LAUNCHER)
                 .setComponent(e.component)
@@ -300,7 +498,7 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.Holder> {
         return position >= 0 && position < items.size() ? items.get(position).label : "";
     }
 
-    /** A vivid colour sampled from the app's banner (or icon), cached per entry; a card's accent when it set one. */
+    /** A vivid colour sampled from the app's banner (or icon), cached per entry. */
     int ambientColorAt(int position) {
         if (position < 0 || position >= items.size()) return 0xFF444444;
         Entry e = items.get(position);
@@ -350,68 +548,43 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.Holder> {
         return Color.HSVToColor(hsv);
     }
 
-    /** Corner radius for a tile of this width: 16dp at the design width, proportionally less when smaller. */
-    static float cornerRadius(int tileWidthPx, float density) {
-        return 16f * density * Math.min(1f, tileWidthPx / (DESIGN_W_DP * density));
-    }
-
     static final class Holder extends RecyclerView.ViewHolder {
         final View card;
         final ImageView banner;
         final ImageView icon;
         final TextView label;
         final TextView name;
-        final boolean reducedMotion;
+        Runnable pendingLongPress;
+        boolean keyHeld;
+        boolean longTriggered;
 
-        Holder(View v, TileListener listener, boolean reducedMotion) {
+        Holder(View v, TileListener listener) {
             super(v);
             card = v.findViewById(R.id.card);
             banner = v.findViewById(R.id.banner);
             icon = v.findViewById(R.id.icon);
             label = v.findViewById(R.id.label);
             name = v.findViewById(R.id.name);
-            this.reducedMotion = reducedMotion;
 
             final float density = v.getResources().getDisplayMetrics().density;
+            final float radius = density * 16f;
             card.setOutlineProvider(new ViewOutlineProvider() {
                 @Override
                 public void getOutline(View view, Outline outline) {
-                    // 16dp at the design width, scaled down with the tile so small tiles keep the same shape.
-                    outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), cornerRadius(view.getWidth(), density));
+                    outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), radius);
                 }
             });
             card.setClipToOutline(true);
 
-            card.setOnKeyListener((view, keyCode, event) -> {
-                if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
-                if (keyCode != KeyEvent.KEYCODE_DPAD_UP && keyCode != KeyEvent.KEYCODE_DPAD_DOWN
-                        && keyCode != KeyEvent.KEYCODE_DPAD_LEFT && keyCode != KeyEvent.KEYCODE_DPAD_RIGHT) return false;
-                int pos = getBindingAdapterPosition();
-                return listener != null && pos != RecyclerView.NO_POSITION && listener.onTileVerticalKey(pos, keyCode);
-            });
-
             card.setOnFocusChangeListener((view, focused) -> {
                 float s = focused ? FOCUS_SCALE : 1.0f;
-                view.animate().cancel();
-                name.animate().cancel();
-                if (reducedMotion) {
-                    // No overshoot: the extra frames redraw the banner and the dock band on a weak GPU.
-                    view.animate().scaleX(s).scaleY(s)
-                            .setDuration(focused ? 120 : 80)
-                            .setInterpolator(new DecelerateInterpolator())
-                            .withLayer()
-                            .start();
-                    name.animate().alpha(focused ? 1f : 0f).setDuration(100).start();
-                } else {
-                    view.animate().scaleX(s).scaleY(s)
-                            .setDuration(focused ? 260 : 180)
-                            .setInterpolator(new OvershootInterpolator(focused ? 1.6f : 0f))
-                            .withLayer()
-                            .start();
-                    name.animate().alpha(focused ? 1f : 0f)
-                            .translationY(focused ? density * 4f : -density * 6f)
-                            .setDuration(220).start();
-                }
+                view.animate().scaleX(s).scaleY(s)
+                        .setDuration(focused ? 260 : 180)
+                        .setInterpolator(new OvershootInterpolator(focused ? 1.6f : 0f))
+                        .start();
+                name.animate().alpha(focused ? 1f : 0f)
+                        .translationY(focused ? density * 4f : -density * 6f)
+                        .setDuration(220).start();
                 int pos = getBindingAdapterPosition();
                 if (focused && listener != null && pos != RecyclerView.NO_POSITION) {
                     listener.onTileFocused(pos, view);
