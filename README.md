@@ -12,7 +12,7 @@ Projet communautaire basé sur [CleanYourTV](https://github.com/Gathin23/cleanyo
 
 **[⬇️ Télécharger TV-Launcher Min v4.2.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.2.0/tv-launcher.apk)** · [📦 Toutes les versions](https://github.com/vincent-deprato/tv-launcher-min/releases)
 
-![TV-Launcher Min sur Sony Bravia](docs/images/tv-launcher-sony.png)
+![TV-Launcher Min v4.2.0 — écran d'accueil sur Sony Bravia](https://github.com/user-attachments/assets/1fdadb7a-4a3a-49af-9b41-ab5b42b9f3c3)
 
 ---
 
@@ -44,6 +44,21 @@ Développé et testé principalement sur une **Sony Bravia KD-55XF9005** sous An
 - Pas de service de surveillance permanente pour ces informations.
 
 **Limite connue :** l'import/export JSON des préférences n'est pas disponible dans la version 4.2.
+
+### 🖼️ Aperçu des fonctionnalités
+
+Captures d'écran de la **Release v4.2.0**, réalisées sur Sony Bravia.
+
+<table>
+  <tr>
+    <td width="50%"><img src="https://github.com/user-attachments/assets/3030eb60-a677-4c5d-b8f9-be658d0e28ac" alt="TV-Launcher Min v4.2.0 — capture des fonctionnalités 1" width="100%" /></td>
+    <td width="50%"><img src="https://github.com/user-attachments/assets/8d7ac89d-775a-4e9f-8e8e-857074b483b0" alt="TV-Launcher Min v4.2.0 — capture des fonctionnalités 2" width="100%" /></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="https://github.com/user-attachments/assets/d303019e-0cea-415c-8d41-555daf4abd79" alt="TV-Launcher Min v4.2.0 — capture des fonctionnalités 3" width="100%" /></td>
+    <td width="50%"><img src="https://github.com/user-attachments/assets/dbede6d9-b3fd-453e-aeea-48528b8eca68" alt="TV-Launcher Min v4.2.0 — capture des fonctionnalités 4" width="100%" /></td>
+  </tr>
+</table>
 
 ### 📥 Téléchargement et installation
 
@@ -222,6 +237,21 @@ Primarily developed and tested on a **Sony Bravia KD-55XF9005**. Compatibility w
 - Preferences saved locally.
 
 **Known limitation:** JSON backup and restore are not available in v4.2.
+
+### 🖼️ Feature screenshots
+
+Screenshots from the **v4.2.0 Release**, captured on a Sony Bravia.
+
+<table>
+  <tr>
+    <td width="50%"><img src="https://github.com/user-attachments/assets/3030eb60-a677-4c5d-b8f9-be658d0e28ac" alt="TV-Launcher Min v4.2.0 — feature screenshot 1" width="100%" /></td>
+    <td width="50%"><img src="https://github.com/user-attachments/assets/8d7ac89d-775a-4e9f-8e8e-857074b483b0" alt="TV-Launcher Min v4.2.0 — feature screenshot 2" width="100%" /></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="https://github.com/user-attachments/assets/d303019e-0cea-415c-8d41-555daf4abd79" alt="TV-Launcher Min v4.2.0 — feature screenshot 3" width="100%" /></td>
+    <td width="50%"><img src="https://github.com/user-attachments/assets/dbede6d9-b3fd-453e-aeea-48528b8eca68" alt="TV-Launcher Min v4.2.0 — feature screenshot 4" width="100%" /></td>
+  </tr>
+</table>
 
 ### 📥 Download and installation
 
