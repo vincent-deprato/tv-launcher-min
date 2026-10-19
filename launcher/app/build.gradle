@@ -2,6 +2,13 @@ plugins {
     id 'com.android.application'
 }
 
+// Local signing credentials — NEVER commit launcher/signing.properties.
+def signingFile = rootProject.file('signing.properties')
+def signingProps = new Properties()
+if (signingFile.isFile()) {
+    signingFile.withInputStream { input -> signingProps.load(input) }
+}
+
 android {
     namespace 'com.gathin.tvhome'
     compileSdk 34
@@ -14,9 +21,21 @@ android {
         versionName '4.2'
     }
 
+    signingConfigs {
+        release {
+            if (signingFile.isFile()) {
+                storeFile file(signingProps.getProperty('storeFile', ''))
+                storePassword signingProps.getProperty('storePassword', '')
+                keyAlias signingProps.getProperty('keyAlias', '')
+                keyPassword signingProps.getProperty('keyPassword', '')
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
+            signingConfig signingConfigs.release
         }
     }
 
@@ -42,4 +61,21 @@ android {
 dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.3.2'
     implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
+}
+
+// Refuse release builds without a complete signing configuration.
+gradle.taskGraph.whenReady { graph ->
+    if (graph.hasTask(':app:assembleRelease')) {
+        if (!signingFile.isFile()) {
+            throw new GradleException('Missing launcher/signing.properties')
+        }
+        ['storeFile','storePassword','keyAlias','keyPassword'].each { key ->
+            if (!signingProps.getProperty(key)?.trim()) {
+                throw new GradleException('Missing signing key property: ' + key)
+            }
+        }
+        if (!file(signingProps.getProperty('storeFile')).isFile()) {
+            throw new GradleException('Release keystore file does not exist')
+        }
+    }
 }
