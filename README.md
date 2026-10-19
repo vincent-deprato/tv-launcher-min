@@ -1,51 +1,169 @@
-# TV-Launcher Min
+# 📺 TV-Launcher Min
 
-[Français](#français) · [English](#english)
+**A lightweight, customizable Android TV launcher.**
 
-> A lightweight, remote-friendly Android TV launcher based on [CleanYourTV](https://github.com/Gathin23/cleanyourtv) / TV-VibeHack. This is a community fork, not an official Sony or Android product.
+Un launcher Android TV léger, personnalisable et pensé pour une navigation simple à la télécommande, notamment sur les téléviseurs disposant de peu de mémoire RAM.
 
-![TV-Launcher running on a Sony Bravia](docs/images/tv-launcher-sony.png)
+Projet communautaire basé sur [CleanYourTV](https://github.com/Gathin23/cleanyourtv) / TV-VibeHack.
 
-## Français
+[🇫🇷 Français](#-français) · [🇬🇧 English](#-english)
 
-### Présentation
+**Version :** 4.2.0 · **Android :** 8.0+ · **Statut :** préversion publique
 
-**TV-Launcher Min v4.2.0** est une personnalisation de CleanYourTV conçue pour une navigation épurée à la télécommande, notamment sur les téléviseurs Android TV disposant de peu de RAM. La version a été testée par le mainteneur sur une Sony Bravia Android TV ; sa compatibilité avec d'autres appareils reste à confirmer.
+**[⬇️ Télécharger TV-Launcher Min v4.2.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.2.0/tv-launcher.apk)** · [📦 Toutes les versions](https://github.com/vincent-deprato/tv-launcher-min/releases)
 
-### Fonctionnalités
+![TV-Launcher Min sur Sony Bravia](docs/images/tv-launcher-sony.png)
 
-- Interface française avec horloge, date et raccourcis Sources, Wi-Fi et Paramètres.
-- Six favoris : modifier leur ordre ou remplacer une application directement depuis la TV.
-- Organiser, déplacer, masquer et réafficher les applications de la grille.
-- Menus harmonisés pour une utilisation à la télécommande.
-- Diagnostic ponctuel de la mémoire et du stockage, sans surveillance permanente.
-- Appui long sur une application : informations système de l'application.
-- Les choix d'organisation sont enregistrés localement.
+---
 
-**Non inclus :** sauvegarde/restauration JSON. Ces options ont été retirées dans la version 4.2.
+## 🇫🇷 Français
 
-### Installation
+### ✨ Présentation
 
-1. Ouvrir [Releases](https://github.com/vincent-deprato/tv-launcher-min/releases), puis choisir `v4.2.0` **lorsqu'elle sera publiée**.
-2. Télécharger `tv-launcher.apk`, vérifier qu'il s'agit d'une version signée et installable, puis installer l'APK sur votre TV avec ADB (ou un installateur d'APK compatible).
-3. Activer le débogage Android sur la TV, puis depuis un ordinateur :
+**TV-Launcher Min v4.2.0** personnalise CleanYourTV pour proposer un écran d'accueil Android TV épuré, fluide et utilisable entièrement à la télécommande.
+
+Son objectif : **afficher l'essentiel, faciliter l'accès aux applications et éviter les fonctionnalités exécutées inutilement en arrière-plan.**
+
+Développé et testé principalement sur une **Sony Bravia KD-55XF9005** sous Android TV. La compatibilité avec d'autres appareils reste à confirmer.
+
+### 🚀 Fonctionnalités
+
+**Interface et navigation**
+- Interface sombre inspirée de tvOS, avec horloge et date.
+- Raccourcis Sources, Wi-Fi et Paramètres.
+- Menus compacts et harmonisés, adaptés à la télécommande.
+
+**Favoris et applications**
+- Six favoris personnalisables : déplacer, réordonner ou remplacer les applications.
+- Réorganisation de la grille principale ; possibilité de masquer et réafficher des applications.
+- Appui long sur une application pour ouvrir ses informations système.
+- Préférences enregistrées localement.
+
+**Diagnostic**
+- Consultation ponctuelle de la mémoire RAM et du stockage.
+- Pas de service de surveillance permanente pour ces informations.
+
+**Limite connue :** l'import/export JSON des préférences n'est pas disponible dans la version 4.2.
+
+### 📥 Téléchargement et installation
+
+**[Télécharger tv-launcher.apk — v4.2.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.2.0/tv-launcher.apk)**
+
+Deux méthodes sont possibles. **Ne désactivez pas le launcher constructeur** : testez d'abord TV-Launcher Min et assurez-vous de pouvoir revenir à l'accueil d'origine.
+
+#### Méthode A — Installation sans ordinateur
+
+1. Téléchargez `tv-launcher.apk` depuis la Release officielle.
+2. Transférez l'APK sur la TV (clé USB, gestionnaire de fichiers ou outil de transfert compatible).
+3. Ouvrez le fichier et autorisez l'installation depuis cette source si Android le demande.
+4. Installez l'application et lancez TV-Launcher Min.
+5. Si Android propose de choisir une application d'accueil, sélectionnez **TV-Launcher Min**.
+
+Certains firmwares Sony ne proposent pas de sélecteur d'accueil ; dans ce cas, la méthode ADB peut être nécessaire.
+
+#### Méthode B — Installation via ADB (Windows)
+
+**1. Préparer ADB**
+
+Téléchargez les outils officiels [Android SDK Platform-Tools](https://developer.android.com/tools/releases/platform-tools), décompressez-les (par exemple dans `C:\platform-tools`) et ouvrez PowerShell dans ce dossier.
+
+Sur la TV, activez les **Options pour les développeurs** puis le **débogage ADB/USB**. La connexion ADB par réseau doit être prise en charge et activée ; sur certains appareils, un branchement USB initial est nécessaire.
+
+**2. Se connecter à la TV**
 
 ```powershell
-adb connect ADRESSE_IP_TV:5555
-adb install -r tv-launcher.apk
+.\adb.exe connect ADRESSE_IP_TV:5555
+.\adb.exe devices
 ```
 
-4. Sélectionner TV-Launcher comme application d'accueil dans les paramètres Android, si l'option est disponible. Sur certains appareils, la commande ADB suivante peut être prise en charge (non garantie) :
+Adaptez **l'adresse IP et le port** à votre TV : `5555` n'est pas universel. La TV doit apparaître dans l'état `device`. Autorisez le débogage depuis la télévision si elle affiche une demande de confirmation.
+
+**3. Noter l'accueil actuel avant de le changer**
 
 ```powershell
-adb shell cmd package set-home-activity com.gathin.tvhome/.MainActivity
+.\adb.exe shell cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME
 ```
 
-**Sécurité :** ne désactivez pas le launcher constructeur avant d'avoir testé celui-ci. Pour revenir en arrière, choisissez l'accueil précédent dans les paramètres Android ou désinstallez TV-Launcher via `adb uninstall com.gathin.tvhome` lorsque cela est possible.
+Conservez le résultat pour faciliter un retour arrière. Selon le firmware, cette commande peut retourner un sélecteur d'accueil plutôt que l'application constructeur.
 
-### Compilation depuis les sources
+**4. Installer l'APK**
 
-Prérequis : JDK 17+, SDK Android (API 34), Build Tools 34.0.0 et ADB.
+Placez `tv-launcher.apk` dans le dossier courant et lancez :
+
+```powershell
+.\adb.exe install -r .\tv-launcher.apk
+```
+
+Le résultat attendu est `Success`.
+
+**5. Lancer TV-Launcher Min**
+
+```powershell
+.\adb.exe shell am start -n com.gathin.tvhome/.MainActivity
+```
+
+**6. Choisir TV-Launcher comme accueil**
+
+Utilisez d'abord les paramètres d'applications par défaut ou le sélecteur Home d'Android, si disponibles. Certains appareils acceptent cette commande :
+
+```powershell
+.\adb.exe shell cmd package set-home-activity com.gathin.tvhome/.MainActivity
+```
+
+Vérifiez le résultat :
+
+```powershell
+.\adb.exe shell cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME
+```
+
+Si TV-Launcher est sélectionné, le résultat doit mentionner `com.gathin.tvhome/.MainActivity`. Testez la touche **Home**, la navigation, les favoris, les sources HDMI et l'accès aux paramètres, puis redémarrez la TV pour vérifier le comportement au démarrage.
+
+> ⚠️ **Sécurité :** n'utilisez pas de commandes de désactivation des services Sony, Google, SystemUI ou du tuner pour forcer le changement de launcher. Le fonctionnement dépend du modèle et du firmware.
+
+### ↩️ Revenir au launcher d'origine
+
+**Solution recommandée :** sélectionnez l'application d'accueil d'origine depuis les paramètres Android TV, si cette option est disponible.
+
+**Via ADB :** si vous avez relevé le composant exact de l'accueil constructeur, essayez :
+
+```powershell
+.\adb.exe shell cmd package set-home-activity PACKAGE_ORIGINE/ACTIVITE_ORIGINE
+```
+
+Remplacez les valeurs par celles de **votre propre appareil**. La commande n'est pas disponible sur tous les firmwares.
+
+**Désinstaller TV-Launcher Min :**
+
+```powershell
+.\adb.exe uninstall com.gathin.tvhome
+```
+
+La désinstallation supprime normalement les favoris et préférences locales. Elle ne réactive **pas automatiquement** un launcher constructeur qui aurait été désactivé séparément.
+
+### 🔧 Problèmes fréquents
+
+| Message ou symptôme | Que faire ? |
+|---|---|
+| `INSTALL_FAILED_UPDATE_INCOMPATIBLE` | Une version installée utilise une signature différente (par exemple une ancienne version debug). La désinstallation peut être nécessaire, avec perte possible des réglages. |
+| `device unauthorized` | Confirmez l'autorisation de débogage sur la TV. |
+| `device offline` | Vérifiez la connexion puis reconnectez ADB. |
+| Connexion ADB refusée | Vérifiez que le débogage réseau est disponible, activé et sur le bon port. |
+| Home ouvre toujours l'ancien launcher | Vérifiez l'application d'accueil sélectionnée dans Android. |
+| L'installation réussit, mais l'application ne s'ouvre pas | Vérifiez la compatibilité Android et consultez au besoin `adb logcat`. |
+
+### 🔄 Mises à jour
+
+Les futures versions officielles peuvent normalement être installées sans désinstallation :
+
+```powershell
+.\adb.exe install -r .\tv-launcher.apk
+```
+
+Pour conserver les préférences, l'APK doit utiliser le **même identifiant** (`com.gathin.tvhome`), le **même certificat de signature** et un `versionCode` compatible. Une ancienne version **debug** ne peut pas nécessairement être remplacée directement par une Release signée.
+
+### 🛠️ Compiler depuis les sources
+
+Prérequis : **JDK 17**, Android SDK Platform **34**, Build Tools **34.0.0** et Gradle Wrapper fourni.
 
 ```powershell
 cd launcher
@@ -55,59 +173,139 @@ $env:ANDROID_HOME = "CHEMIN_VERS_VOTRE_SDK"
 .\gradlew.bat assembleDebug --console=plain
 ```
 
-La compilation de développement produit normalement `launcher/app/build/outputs/apk/debug/tv-launcher.apk`. **Attention : l'APK debug n'est pas recommandé pour la distribution publique** ; les Releases doivent contenir un APK signé avec une clé de publication conservée pour les mises à jour.
+APK généré : `launcher/app/build/outputs/apk/debug/tv-launcher.apk`.
 
-### Compatibilité et limites
+La clé privée utilisée pour signer les Releases publiques **n'est pas fournie dans le dépôt**. Les APK debug ne sont pas destinés à la distribution publique.
 
-- Source actuelle : `minSdk 26`, `targetSdk 29`, `compileSdk 34` ; la compatibilité sur des Android TV modernes n'est pas garantie.
-- Certains contrôles de sources HDMI, informations réseau ou dialogues peuvent dépendre du fabricant.
-- Le diagnostic mémoire Android est indicatif ; il ne remplace pas les mesures PSS détaillées.
+### 📺 Compatibilité et limites
 
-### Crédits et licence
+| Élément | Valeur |
+|---|---|
+| Version | 4.2.0 |
+| Identifiant Android | `com.gathin.tvhome` |
+| Android minimum | API 26 — Android 8.0 |
+| Target SDK | API 29 |
+| Compile SDK | API 34 |
+| Appareil de référence | Sony Bravia KD-55XF9005 |
+| Autres appareils | Compatibilité non garantie |
 
-Fork dérivé de [CleanYourTV](https://github.com/Gathin23/cleanyourtv) par Gathin23. Conserver les notices de copyright et les licences du dépôt original, notamment la licence du code et celle de la police Outfit. Voir les fichiers de licence fournis par le dépôt d'origine. Les noms et logos des applications appartiennent à leurs propriétaires respectifs.
+Certaines fonctions (sources HDMI, informations réseau, dialogues système) dépendent du fabricant. Les chiffres de mémoire affichés sont indicatifs et ne remplacent pas une mesure PSS détaillée.
+
+### 🤝 Contributions
+
+Retours, suggestions et signalements de bugs sont bienvenus dans les [issues GitHub](https://github.com/vincent-deprato/tv-launcher-min/issues). Indiquez si possible le modèle de TV, la version d'Android TV, la version de TV-Launcher et les étapes pour reproduire le problème.
+
+### 📜 Crédits et licences
+
+Fork communautaire basé sur [CleanYourTV](https://github.com/Gathin23/cleanyourtv) par **Gathin23**. Les droits d'auteur et conditions de licence du projet d'origine, ainsi que des composants tiers tels que la police Outfit, restent applicables. Les noms et logos des applications appartiennent à leurs propriétaires respectifs.
+
+TV-Launcher Min est indépendant et n'est ni développé ni approuvé par Sony ou Google.
 
 ---
 
-## English
+## 🇬🇧 English
 
-### About
+### ✨ Overview
 
-**TV-Launcher Min v4.2.0** is a streamlined Android TV home-screen customization based on CleanYourTV. It is designed for remote-control navigation and older devices with limited RAM. The maintainer has tested it on a Sony Bravia Android TV; other devices have not been validated.
+**TV-Launcher Min v4.2.0** is a lightweight, remote-friendly Android TV home screen based on CleanYourTV. It focuses on fast app access, a clean interface and minimal unnecessary background activity.
 
-### Features
+Primarily developed and tested on a **Sony Bravia KD-55XF9005**. Compatibility with other devices has not been verified.
 
-- French-language home screen with clock, date, input, Wi-Fi and settings shortcuts.
-- Six editable favorites: reorder or replace apps on your TV.
+### 🚀 Features
+
+- Dark, tvOS-inspired interface with clock, date and Sources / Wi-Fi / Settings shortcuts.
+- Six editable favorite apps: reorder or replace them from the TV.
 - Reorder, hide and restore apps in the main grid.
-- Consistent, remote-friendly menus.
-- On-demand RAM/storage information without a persistent monitoring service.
-- Long-press on an app to open its Android app-information screen.
-- Settings are saved locally.
+- Consistent menus optimized for remote-control navigation.
+- Long-press an app to access its Android information screen.
+- On-demand RAM/storage information without a permanent monitoring service.
+- Preferences saved locally.
 
-**Not included:** JSON backup/restore; removed in v4.2.
+**Known limitation:** JSON backup and restore are not available in v4.2.
 
-### Installation
+### 📥 Download and installation
 
-1. Open [Releases](https://github.com/vincent-deprato/tv-launcher-min/releases) and choose `v4.2.0` **once published**.
-2. Download the properly signed `tv-launcher.apk` and install it via ADB or a compatible installer:
+**[Download tv-launcher.apk — v4.2.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.2.0/tv-launcher.apk)**
+
+**Without a computer:** download the APK from GitHub, transfer it to the TV by USB drive or a compatible file manager, allow installation from that source if prompted, install it, and open TV-Launcher Min. Select it as the default Home app if Android offers that option.
+
+**Using ADB on Windows:**
+
+1. Install [Android SDK Platform-Tools](https://developer.android.com/tools/releases/platform-tools).
+2. Enable Developer options and ADB debugging on the TV. Network ADB must also be supported and enabled.
+3. From PowerShell, connect and confirm the `device` status (replace the IP address **and port** with your TV's actual details):
 
 ```powershell
 adb connect TV_IP_ADDRESS:5555
-adb install -r tv-launcher.apk
+adb devices
 ```
 
-3. Select TV-Launcher as the default Home application in Android settings if supported. Some systems also accept:
+4. Record the existing Home component *before* making changes:
+
+```powershell
+adb shell cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME
+```
+
+5. Install the downloaded APK and launch it:
+
+```powershell
+adb install -r tv-launcher.apk
+adb shell am start -n com.gathin.tvhome/.MainActivity
+```
+
+6. Select TV-Launcher Min through Android's Home/default-app settings if available. Some devices support:
 
 ```powershell
 adb shell cmd package set-home-activity com.gathin.tvhome/.MainActivity
+adb shell cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME
 ```
 
-**Safety:** keep the stock launcher enabled until you've tested TV-Launcher. To roll back, switch to the previous Home app or use `adb uninstall com.gathin.tvhome`, where supported.
+Confirm that the output identifies `com.gathin.tvhome/.MainActivity`. Test the **Home** key, apps, HDMI inputs and settings before rebooting to test startup.
 
-### Build from source
+> ⚠️ **Safety:** never disable the manufacturer's stock launcher or Sony/Google/Android system components just to force a Home-app change. Behavior varies by device and firmware.
 
-Requirements: JDK 17+, Android SDK Platform 34, Build Tools 34.0.0 and ADB.
+### ↩️ Restore the original launcher
+
+**Preferred:** use Android's Home/default-app settings to choose the original launcher.
+
+If you recorded the original component from your TV, you can try:
+
+```powershell
+adb shell cmd package set-home-activity ORIGINAL_PACKAGE/ORIGINAL_ACTIVITY
+```
+
+To uninstall TV-Launcher Min:
+
+```powershell
+adb uninstall com.gathin.tvhome
+```
+
+Uninstalling normally deletes its local preferences and favorites. It will **not** automatically re-enable a stock launcher disabled separately.
+
+### 🔧 Troubleshooting
+
+| Message or symptom | What to do |
+|---|---|
+| `INSTALL_FAILED_UPDATE_INCOMPATIBLE` | The existing app has a different signing certificate (often an older debug build). Uninstalling may be required and may erase preferences. |
+| `device unauthorized` | Authorize the computer on the TV. |
+| `device offline` | Check the connection and reconnect ADB. |
+| ADB connection refused | Ensure network ADB is available and listening on the correct port. |
+| Home still opens the original launcher | Review Android's selected default Home app. |
+| App installed but does not launch | Check compatibility and inspect `adb logcat` if needed. |
+
+### 🔄 Updates
+
+Official releases can normally be installed over existing versions:
+
+```powershell
+adb install -r tv-launcher.apk
+```
+
+Settings are generally preserved if the package name (`com.gathin.tvhome`), signing certificate and version code remain compatible. A debug build may not be directly upgradeable to the officially signed release.
+
+### 🛠️ Build from source
+
+Requirements: **JDK 17**, Android SDK Platform **34**, Build Tools **34.0.0** and the included Gradle Wrapper.
 
 ```powershell
 cd launcher
@@ -117,14 +315,27 @@ $env:ANDROID_HOME = "PATH_TO_YOUR_ANDROID_SDK"
 .\gradlew.bat assembleDebug --console=plain
 ```
 
-The debug build normally generates `launcher/app/build/outputs/apk/debug/tv-launcher.apk`. Do **not** treat debug signing as a proper long-term public release signature.
+Debug APK: `launcher/app/build/outputs/apk/debug/tv-launcher.apk`.
 
-### Compatibility / known limits
+Public releases use a private signing key **not included** in the repository. Debug APKs are not recommended for public distribution.
 
-- Current source settings: `minSdk 26`, `targetSdk 29`, `compileSdk 34`.
-- OEM-dependent features may vary between Android TV manufacturers.
-- RAM figures are informational and not equivalent to a detailed system-wide PSS analysis.
+### 📺 Compatibility and limitations
 
-### Attribution
+- Minimum Android version: **Android 8.0 (API 26)**.
+- Target SDK: **29**. Compile SDK: **34**.
+- Reference device: **Sony Bravia KD-55XF9005**.
+- Other Android TV / Google TV devices: **not guaranteed**.
+- HDMI input controls, network information and system dialogs may be OEM-dependent.
+- RAM information is indicative, not a full PSS measurement.
 
-Based on [CleanYourTV](https://github.com/Gathin23/cleanyourtv) by Gathin23. Preserve the upstream copyright notices and license files, including third-party font licensing. App names/logos are trademarks of their respective owners.
+### 🤝 Feedback and contributions
+
+Bug reports, compatibility feedback and suggestions are welcome. Please include the TV model, Android version, launcher version and steps to reproduce.
+
+[Open an issue](https://github.com/vincent-deprato/tv-launcher-min/issues)
+
+### 📜 Attribution and licenses
+
+Community fork based on [CleanYourTV](https://github.com/Gathin23/cleanyourtv) by **Gathin23**. Original copyright notices and license requirements, including third-party fonts such as Outfit, remain applicable. App names/logos are trademarks of their respective owners.
+
+This project is not affiliated with or endorsed by Sony or Google.
