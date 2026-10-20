@@ -192,6 +192,14 @@ APK généré : `launcher/app/build/outputs/apk/debug/tv-launcher.apk`.
 
 La clé privée utilisée pour signer les Releases publiques **n'est pas fournie dans le dépôt**. Les APK debug ne sont pas destinés à la distribution publique.
 
+### 🧪 Version 4.3 — validation Xiaomi Google TV
+
+Le build **v4.3 signé** a été testé sur **Xiaomi TV Box S 2e génération** (`MiTV-AFKR0`, Android 11, firmware `773`) : grille, masquage, diagnostic RAM/stockage et persistance des préférences. Le launcher reste sélectionné après redémarrage et la touche **Home** fonctionne.
+
+**Limitation confirmée :** les touches dédiées **Netflix, Prime Video, YouTube et Apps** ne fonctionnent plus lorsque le launcher Google TV est désactivé. Un remappage est à étudier et n'est pas encore validé sur cette Xiaomi.
+
+**[Procédure Xiaomi détaillée, avertissements Wi-Fi et restauration Google TV](docs/XIAOMI-BOX-S-2ND-GEN.md)**. La méthode ADB comporte un risque de perte de Wi-Fi et d'accueil ; elle n'est pas générale à tous les appareils.
+
 ### 📺 Compatibilité et limites
 
 | Élément | Valeur |
@@ -348,6 +356,14 @@ $env:ANDROID_HOME = "PATH_TO_YOUR_ANDROID_SDK"
 Debug APK: `launcher/app/build/outputs/apk/debug/tv-launcher.apk`.
 
 Public releases use a private signing key **not included** in the repository. Debug APKs are not recommended for public distribution.
+
+### 🧪 Version 4.3 — Xiaomi Google TV validation
+
+The **signed v4.3 build** was tested on a **Xiaomi TV Box S 2nd gen** (`MiTV-AFKR0`, Android 11, firmware `773`): grid reordering/hiding, RAM/storage diagnostics, preference persistence, and HOME surviving a reboot.
+
+**Confirmed limitation:** dedicated **Netflix, Prime Video, YouTube, and Apps** remote keys stopped working after disabling the stock Google TV launcher. Remapping is not yet validated on this device.
+
+**[Xiaomi-specific installation, Wi-Fi risks and Google TV recovery guide](docs/XIAOMI-BOX-S-2ND-GEN.md)**. This ADB procedure is firmware-specific and can interrupt Wi-Fi or HOME.
 
 ### 📺 Compatibility and limitations
 
