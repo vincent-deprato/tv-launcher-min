@@ -4,7 +4,6 @@ import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -87,6 +86,7 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.Holder> {
     private final List<String> customOrder = new ArrayList<>();
     private static final String HIDDEN_KEY = "hidden_apps_v4";
     private static final String GRID_KEY = "grid_order_v4";
+    private static final String GRID_SAVED_KEY = "grid_state_initialized_v43";
     private final List<Entry> items = new ArrayList<>();
 
     AppAdapter(Context ctx, TileListener listener, int dockSize) {
@@ -109,6 +109,8 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.Holder> {
         if (!hiddenSaved.isEmpty()) hidden.addAll(Arrays.asList(hiddenSaved.split("\\|")));
         String gridSaved = prefs.getString(GRID_KEY, "");
         if (!gridSaved.isEmpty()) for (String pkg : gridSaved.split("\\|")) if (!pkg.isEmpty() && !customOrder.contains(pkg)) customOrder.add(pkg);
+        // Preserve existing v4 entries, then snapshot even an empty grid state to disk.
+        // The migration does not reset favorites or previously saved positions.
         // Tiles keep their identity across reload(), so a focused tile stays on its app instead of
         // its view being rebound to whatever app now sits in that slot.
         setHasStableIds(true);
@@ -323,16 +325,16 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.Holder> {
             new String[]{"Déplacer dans la grille", "Masquer de l'accueil"},
             new String[]{"↕", "⊘"}, -1, choice -> {
                 if (choice == 0) showGridPositions(pkg);
-                else new AlertDialog.Builder(ctx)
-                    .setTitle("Masquer " + label + " ?")
-                    .setMessage("L'application restera installée sur la TV.")
-                    .setPositiveButton("Masquer", (d, w) -> {
-                        hidden.add(pkg);
-                        persistGrid();
-                        reload();
-                        Toast.makeText(ctx, label + " masquée", Toast.LENGTH_SHORT).show();
-                    })
-                    .setNegativeButton("Annuler", null).show();
+                else CompactMenu.show(ctx, "Masquer " + label + " ?",
+                    new String[]{"Confirmer le masquage", "Annuler"},
+                    new String[]{"⊘", "←"}, 1, selectedAction -> {
+                        if (selectedAction == 0) {
+                            hidden.add(pkg);
+                            persistGrid();
+                            reload();
+                            Toast.makeText(ctx, label + " masquée", Toast.LENGTH_SHORT).show();
+                        } else showGridActions(pkg);
+                    }, () -> showGridActions(pkg));
             }, this::showGridManager);
     }
 
@@ -401,12 +403,13 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.Holder> {
         Set<String> extra = new HashSet<>(hidden); extra.removeAll(base);
         ctx.getSharedPreferences(PREFS,Context.MODE_PRIVATE).edit()
             .putString(HIDDEN_KEY,android.text.TextUtils.join("|",extra))
-            .putString(GRID_KEY,android.text.TextUtils.join("|",customOrder)).apply();
+            .putString(GRID_KEY,android.text.TextUtils.join("|",customOrder))
+            .putBoolean(GRID_SAVED_KEY,true).commit();
     }
 
     private void saveFavourites() {
         ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
-                .putString(ORDER_KEY, android.text.TextUtils.join("|", favourites)).apply();
+                .putString(ORDER_KEY, android.text.TextUtils.join("|", favourites)).commit();
     }
 
     /** Long OK on a dock tile: choose a destination. Swaps with that slot. */
