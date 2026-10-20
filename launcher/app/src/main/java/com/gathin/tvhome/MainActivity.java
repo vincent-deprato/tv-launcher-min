@@ -33,6 +33,9 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
+import android.view.WindowManager;
+import android.graphics.Typeface;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -208,21 +211,122 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             }, null);
     }
 
+    /** Single snapshot; no timer, polling or resident memory monitor. */
     private void showDiagnostics() {
-        ActivityManager manager = (ActivityManager)getSystemService(ACTIVITY_SERVICE);
-        ActivityManager.MemoryInfo memory = new ActivityManager.MemoryInfo();
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         if (manager == null) return;
+        ActivityManager.MemoryInfo memory = new ActivityManager.MemoryInfo();
         manager.getMemoryInfo(memory);
         StatFs disk = new StatFs(Environment.getDataDirectory().getAbsolutePath());
-        String report = "RAM totale : " + Formatter.formatShortFileSize(this,memory.totalMem)
-          + "\nRAM disponible : " + Formatter.formatShortFileSize(this,memory.availMem)
-          + "\nSeuil de mémoire faible : " + Formatter.formatShortFileSize(this,memory.threshold)
-          + "\nMémoire faible : " + (memory.lowMemory ? "Oui" : "Non")
-          + "\n\nStockage total : " + Formatter.formatShortFileSize(this,disk.getTotalBytes())
-          + "\nStockage libre : " + Formatter.formatShortFileSize(this,disk.getAvailableBytes())
-          + "\n\nMesure instantanée, sans surveillance permanente.";
-        new AlertDialog.Builder(this).setTitle("Diagnostic système")
-          .setMessage(report).setPositiveButton("Fermer",null).show();
+
+        long ramTotal = memory.totalMem;
+        long ramFree = memory.availMem;
+        long diskTotal = disk.getTotalBytes();
+        long diskFree = disk.getAvailableBytes();
+
+        LinearLayout content = new LinearLayout(this);
+        content.setOrientation(LinearLayout.VERTICAL);
+        int pad = Math.round(20 * getResources().getDisplayMetrics().density);
+        content.setPadding(pad, pad, pad, pad);
+        GradientDrawable panel = new GradientDrawable();
+        panel.setColor(0xFF1D293A);
+        panel.setCornerRadius(18 * getResources().getDisplayMetrics().density);
+        panel.setStroke(Math.round(getResources().getDisplayMetrics().density), 0xFF526985);
+        content.setBackground(panel);
+
+        TextView heading = new TextView(this);
+        heading.setText("Diagnostic système");
+        heading.setTextColor(Color.WHITE);
+        heading.setTextSize(22);
+        heading.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        heading.setPadding(0, 0, 0, pad);
+        content.addView(heading);
+
+        addDiagnosticBar(content, "Mémoire RAM", ramTotal - ramFree, ramTotal, 0xFF75B4FA);
+        TextView ramDetail = new TextView(this);
+        ramDetail.setText("Disponible : " + Formatter.formatShortFileSize(this, ramFree)
+                + "   •   Seuil faible : " + Formatter.formatShortFileSize(this, memory.threshold));
+        ramDetail.setTextColor(0xFFB5C9E2);
+        ramDetail.setTextSize(13);
+        ramDetail.setPadding(0, 0, 0, pad);
+        content.addView(ramDetail);
+
+        addDiagnosticBar(content, "Stockage interne", diskTotal - diskFree, diskTotal, 0xFF77D9C0);
+        TextView diskDetail = new TextView(this);
+        diskDetail.setText("Disponible : " + Formatter.formatShortFileSize(this, diskFree));
+        diskDetail.setTextColor(0xFFB5C9E2);
+        diskDetail.setTextSize(13);
+        diskDetail.setPadding(0, 0, 0, pad);
+        content.addView(diskDetail);
+
+        TextView status = new TextView(this);
+        status.setText(memory.lowMemory ? "⚠ Android signale une mémoire faible"
+                : "✓ État mémoire : normal");
+        status.setTextColor(memory.lowMemory ? 0xFFFFC47A : 0xFF8CE0C4);
+        status.setTextSize(15);
+        status.setPadding(0, 0, 0, pad / 2);
+        content.addView(status);
+
+        TextView note = new TextView(this);
+        note.setText("Mesure instantanée · sans surveillance en arrière-plan");
+        note.setTextColor(0xFF9EB6D1);
+        note.setTextSize(12);
+        content.addView(note);
+
+        AlertDialog dialog = new AlertDialog.Builder(this).setView(content)
+                .setPositiveButton("Fermer", null).create();
+        dialog.setOnShowListener(ignored -> {
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                int width = getResources().getDisplayMetrics().widthPixels;
+                dialog.getWindow().setLayout(Math.min(Math.round(480 * getResources().getDisplayMetrics().density),
+                        width - 2 * pad), WindowManager.LayoutParams.WRAP_CONTENT);
+                dialog.getWindow().setDimAmount(0.72f);
+                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            }
+            android.widget.Button close = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            if (close != null) {
+                close.setTextColor(0xFFDEEAFF);
+                close.setAllCaps(false);
+                GradientDrawable closeBackground = new GradientDrawable();
+                closeBackground.setColor(0xFF304157);
+                closeBackground.setCornerRadius(12 * getResources().getDisplayMetrics().density);
+                close.setBackground(closeBackground);
+                close.setPadding(pad, 0, pad, 0);
+            }
+        });
+        dialog.show();
+    }
+
+    private void addDiagnosticBar(LinearLayout content, String label, long used, long total, int accent) {
+        long safeTotal = Math.max(1L, total);
+        int percent = (int) Math.max(0, Math.min(100, Math.round(100d * used / safeTotal)));
+
+        TextView title = new TextView(this);
+        title.setText(label + "   " + percent + "%");
+        title.setTextColor(Color.WHITE);
+        title.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        title.setTextSize(17);
+        content.addView(title);
+
+        TextView amount = new TextView(this);
+        amount.setText(Formatter.formatShortFileSize(this, Math.max(0L, used))
+                + " / " + Formatter.formatShortFileSize(this, total));
+        amount.setTextColor(0xFFD0DEF0);
+        amount.setTextSize(14);
+        content.addView(amount);
+
+        ProgressBar progress = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
+        progress.setMax(100);
+        progress.setProgress(percent);
+        progress.setProgressTintList(android.content.res.ColorStateList.valueOf(accent));
+        progress.setProgressBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFF354963));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                Math.round(12 * getResources().getDisplayMetrics().density));
+        params.topMargin = Math.round(8 * getResources().getDisplayMetrics().density);
+        params.bottomMargin = Math.round(8 * getResources().getDisplayMetrics().density);
+        content.addView(progress, params);
     }
 
     @Override
