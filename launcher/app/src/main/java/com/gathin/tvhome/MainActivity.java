@@ -284,6 +284,16 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                 dialog.getWindow().setDimAmount(0.72f);
                 dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
             }
+            android.widget.Button close = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            if (close != null) {
+                close.setTextColor(0xFFDEEAFF);
+                close.setAllCaps(false);
+                GradientDrawable closeBackground = new GradientDrawable();
+                closeBackground.setColor(0xFF304157);
+                closeBackground.setCornerRadius(12 * getResources().getDisplayMetrics().density);
+                close.setBackground(closeBackground);
+                close.setPadding(pad, 0, pad, 0);
+            }
         });
         dialog.show();
     }
