@@ -8,9 +8,9 @@ Projet communautaire basé sur [CleanYourTV](https://github.com/Gathin23/cleanyo
 
 [🇫🇷 Français](#-français) · [🇬🇧 English](#-english)
 
-**Version :** 4.2.0 · **Android :** 8.0+ · **Statut :** préversion publique
+**Version actuelle :** 4.3.0 · **Android :** 8.0+ · **Statut :** Release publique
 
-**[⬇️ Télécharger TV-Launcher Min v4.2.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.2.0/tv-launcher.apk)** · [📦 Toutes les versions](https://github.com/vincent-deprato/tv-launcher-min/releases)
+**[⬇️ Télécharger TV-Launcher Min v4.3.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.3.0/tv-launcher.apk)** · [📦 Toutes les versions](https://github.com/vincent-deprato/tv-launcher-min/releases)
 
 ![TV-Launcher Min v4.2.0 — écran d'accueil sur Sony Bravia](https://github.com/user-attachments/assets/1fdadb7a-4a3a-49af-9b41-ab5b42b9f3c3)
 
@@ -20,11 +20,11 @@ Projet communautaire basé sur [CleanYourTV](https://github.com/Gathin23/cleanyo
 
 ### ✨ Présentation
 
-**TV-Launcher Min v4.2.0** personnalise CleanYourTV pour proposer un écran d'accueil Android TV épuré, fluide et utilisable entièrement à la télécommande.
+**TV-Launcher Min v4.3.0** personnalise CleanYourTV pour proposer un écran d'accueil Android TV épuré, fluide et utilisable entièrement à la télécommande.
 
 Son objectif : **afficher l'essentiel, faciliter l'accès aux applications et éviter les fonctionnalités exécutées inutilement en arrière-plan.**
 
-Développé et testé principalement sur une **Sony Bravia KD-55XF9005** sous Android TV. La compatibilité avec d'autres appareils reste à confirmer.
+Testé sur **Sony Bravia KD-55XF9005** (Android TV) et **Xiaomi TV Box S 2e génération** (Google TV 11, firmware 773). La compatibilité avec d'autres appareils n'est pas garantie.
 
 ### 🚀 Fonctionnalités
 
@@ -43,11 +43,13 @@ Développé et testé principalement sur une **Sony Bravia KD-55XF9005** sous An
 - Consultation ponctuelle de la mémoire RAM et du stockage.
 - Pas de service de surveillance permanente pour ces informations.
 
-**Limite connue :** l'import/export JSON des préférences n'est pas disponible dans la version 4.2.
+**Nouveautés v4.3 :** sauvegarde renforcée de l'ordre de la grille et des applications masquées, confirmations harmonisées avec les menus compacts, et diagnostic graphique RAM/stockage. Tests validés sur Sony Bravia et Xiaomi TV Box S 2e génération.
+
+**Limite connue :** l'import/export JSON des préférences n'est pas disponible en v4.3.
 
 ### 🖼️ Aperçu des fonctionnalités
 
-Captures d'écran de la **Release v4.2.0**, réalisées sur Sony Bravia.
+Captures historiques de la **Release v4.2.0**, réalisées sur Sony Bravia (l'interface v4.3 peut présenter des différences).
 
 <table>
   <tr>
@@ -62,9 +64,9 @@ Captures d'écran de la **Release v4.2.0**, réalisées sur Sony Bravia.
 
 ### 📥 Téléchargement et installation
 
-**[Télécharger tv-launcher.apk — v4.2.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.2.0/tv-launcher.apk)**
+**[Télécharger tv-launcher.apk — v4.3.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.3.0/tv-launcher.apk)**
 
-Deux méthodes sont possibles. **Ne désactivez pas le launcher constructeur** : testez d'abord TV-Launcher Min et assurez-vous de pouvoir revenir à l'accueil d'origine.
+Deux méthodes sont possibles. **Ne désactivez pas le launcher constructeur sans avoir validé une procédure spécifique à votre modèle, ainsi qu'une méthode de restauration** : testez d'abord TV-Launcher Min et assurez-vous de pouvoir revenir à l'accueil d'origine. Sur certaines box Google TV, forcer HOME nécessite de désactiver des composants système avec un risque de perte du Wi-Fi et des raccourcis télécommande. [Procédure Xiaomi validée sur firmware 773](docs/XIAOMI-BOX-S-2ND-GEN.md).
 
 #### Méthode A — Installation sans ordinateur
 
@@ -133,7 +135,7 @@ Vérifiez le résultat :
 
 Si TV-Launcher est sélectionné, le résultat doit mentionner `com.gathin.tvhome/.MainActivity`. Testez la touche **Home**, la navigation, les favoris, les sources HDMI et l'accès aux paramètres, puis redémarrez la TV pour vérifier le comportement au démarrage.
 
-> ⚠️ **Sécurité :** n'utilisez pas de commandes de désactivation des services Sony, Google, SystemUI ou du tuner pour forcer le changement de launcher. Le fonctionnement dépend du modèle et du firmware.
+> ⚠️ **Sécurité :** ne désactivez pas de services système au hasard pour forcer le changement de launcher. Les procédures avancées, comme celle [documentée pour Xiaomi MiTV-AFKR0 firmware 773](docs/XIAOMI-BOX-S-2ND-GEN.md), sont spécifiques au matériel et peuvent couper le Wi-Fi ou l'accueil. Ne jamais désactiver SystemUI, les composants du tuner ou d'autres services essentiels.
 
 ### ↩️ Revenir au launcher d'origine
 
@@ -204,12 +206,13 @@ Le build **v4.3 signé** a été testé sur **Xiaomi TV Box S 2e génération** 
 
 | Élément | Valeur |
 |---|---|
-| Version | 4.2.0 |
+| Version | 4.3.0 |
 | Identifiant Android | `com.gathin.tvhome` |
 | Android minimum | API 26 — Android 8.0 |
 | Target SDK | API 29 |
 | Compile SDK | API 34 |
 | Appareil de référence | Sony Bravia KD-55XF9005 |
+| Xiaomi TV Box S 2e génération | Google TV 11 / firmware 773 : accueil vérifié après redémarrage ; boutons rapides indisponibles après désactivation du launcher d'origine |
 | Autres appareils | Compatibilité non garantie |
 
 Certaines fonctions (sources HDMI, informations réseau, dialogues système) dépendent du fabricant. Les chiffres de mémoire affichés sont indicatifs et ne remplacent pas une mesure PSS détaillée.
@@ -230,9 +233,9 @@ TV-Launcher Min est indépendant et n'est ni développé ni approuvé par Sony o
 
 ### ✨ Overview
 
-**TV-Launcher Min v4.2.0** is a lightweight, remote-friendly Android TV home screen based on CleanYourTV. It focuses on fast app access, a clean interface and minimal unnecessary background activity.
+**TV-Launcher Min v4.3.0** is a lightweight, remote-friendly Android TV home screen based on CleanYourTV. It focuses on fast app access, a clean interface and minimal unnecessary background activity.
 
-Primarily developed and tested on a **Sony Bravia KD-55XF9005**. Compatibility with other devices has not been verified.
+Tested on **Sony Bravia KD-55XF9005** and **Xiaomi TV Box S 2nd gen** (Google TV 11, firmware 773). Compatibility with other devices is not guaranteed.
 
 ### 🚀 Features
 
@@ -244,11 +247,13 @@ Primarily developed and tested on a **Sony Bravia KD-55XF9005**. Compatibility w
 - On-demand RAM/storage information without a permanent monitoring service.
 - Preferences saved locally.
 
-**Known limitation:** JSON backup and restore are not available in v4.2.
+**What's new in v4.3:** more reliable persistence of app ordering and hidden apps, consistent confirmation menus, and graphical RAM/storage diagnostics. Tested on Sony Bravia and Xiaomi TV Box S 2nd gen.
+
+**Known limitation:** JSON backup and restore are not available in v4.3.
 
 ### 🖼️ Feature screenshots
 
-Screenshots from the **v4.2.0 Release**, captured on a Sony Bravia.
+Historical screenshots from the **v4.2.0 Release**, captured on Sony Bravia (v4.3 may look different).
 
 <table>
   <tr>
@@ -263,7 +268,7 @@ Screenshots from the **v4.2.0 Release**, captured on a Sony Bravia.
 
 ### 📥 Download and installation
 
-**[Download tv-launcher.apk — v4.2.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.2.0/tv-launcher.apk)**
+**[Download tv-launcher.apk — v4.3.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.3.0/tv-launcher.apk)**
 
 **Without a computer:** download the APK from GitHub, transfer it to the TV by USB drive or a compatible file manager, allow installation from that source if prompted, install it, and open TV-Launcher Min. Select it as the default Home app if Android offers that option.
 
@@ -300,7 +305,7 @@ adb shell cmd package resolve-activity --brief -a android.intent.action.MAIN -c 
 
 Confirm that the output identifies `com.gathin.tvhome/.MainActivity`. Test the **Home** key, apps, HDMI inputs and settings before rebooting to test startup.
 
-> ⚠️ **Safety:** never disable the manufacturer's stock launcher or Sony/Google/Android system components just to force a Home-app change. Behavior varies by device and firmware.
+> ⚠️ **Safety:** never disable system packages indiscriminately to force HOME. An advanced, device-specific [Xiaomi MiTV-AFKR0 firmware 773 guide](docs/XIAOMI-BOX-S-2ND-GEN.md) documents the risks of Wi-Fi loss, inaccessible HOME, and disabled remote shortcuts. Do not disable SystemUI or essential services.
 
 ### ↩️ Restore the original launcher
 
@@ -369,8 +374,9 @@ The **signed v4.3 build** was tested on a **Xiaomi TV Box S 2nd gen** (`MiTV-AFK
 
 - Minimum Android version: **Android 8.0 (API 26)**.
 - Target SDK: **29**. Compile SDK: **34**.
-- Reference device: **Sony Bravia KD-55XF9005**.
+- Tested devices: **Sony Bravia KD-55XF9005** and **Xiaomi TV Box S 2nd gen** (Google TV 11, firmware 773).
 - Other Android TV / Google TV devices: **not guaranteed**.
+- Xiaomi: dedicated Netflix, Prime Video, YouTube and Apps remote buttons do not work when the Google TV launcher is disabled.
 - HDMI input controls, network information and system dialogs may be OEM-dependent.
 - RAM information is indicative, not a full PSS measurement.
 
