@@ -58,7 +58,7 @@ Captures historiques de la **Release v4.2.0**, réalisées sur Sony Bravia (l'in
   </tr>
   <tr>
     <td width="50%"><img src="https://github.com/user-attachments/assets/d303019e-0cea-415c-8d41-555daf4abd79" alt="TV-Launcher Min v4.2.0 — capture des fonctionnalités 3" width="100%" /></td>
-    <td width="50%"><img src="https://github.com/user-attachments/assets/dbede6d9-b3fd-453e-aeea-48528b8eca68" alt="TV-Launcher Min v4.2.0 — capture des fonctionnalités 4" width="100%" /></td>
+    <td width="50%"><img src="https://github.com/vincent-deprato/tv-launcher-min/blob/55d3b463deb1e183765c5467ecddec91135531c0/docs/images/192-168-1-31-5555_2026-10-21_01-48-46.png" alt="TV-Launcher Min v4.2.0 — capture des fonctionnalités 4" width="100%" /></td>
   </tr>
 </table>
 
