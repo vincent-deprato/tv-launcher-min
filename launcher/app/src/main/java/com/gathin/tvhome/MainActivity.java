@@ -65,6 +65,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private String liveTvPkg;
 
     private AppAdapter adapter;
+    private UpdateManager updateManager;
     private RecyclerView grid;
     private FrameLayout root;
     private GlassView glass;
@@ -111,6 +112,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        updateManager = new UpdateManager(this);
         density = getResources().getDisplayMetrics().density;
         COLUMNS = Math.max(1, getResources().getInteger(R.integer.columns));
         liveTvPkg = getString(R.string.live_tv_package).trim();
@@ -195,18 +197,21 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
 
         ConnectivityManager cm = getSystemService(ConnectivityManager.class);
         if (cm != null) cm.registerDefaultNetworkCallback(networkCallback);
+        // One cheap weekly GitHub request on foreground start; never block HOME.
+        updateManager.checkAutomatic();
     }
 
     /** Lightweight on-demand settings, no background service or resident monitoring. */
     private void showLauncherSettings() {
         CompactMenu.show(this, "Paramètres TV-Launcher",
-            new String[]{"Organiser et masquer les applications", "Diagnostic RAM et stockage", "Paramètres Android de la TV"},
-            new String[]{"▦", "◫", "⚙"},
+            new String[]{"Organiser et masquer les applications", "Diagnostic RAM et stockage", "Rechercher une mise à jour (v" + BuildConfig.VERSION_NAME + ")", "Paramètres Android de la TV"},
+            new String[]{"▦", "◫", "↓", "⚙"},
             -1, choice -> {
                 switch (choice) {
                     case 0: adapter.showGridManager(); break;
                     case 1: showDiagnostics(); break;
-                    case 2: open(new Intent(Settings.ACTION_SETTINGS)); break;
+                    case 2: updateManager.checkManual(); break;
+                    case 3: open(new Intent(Settings.ACTION_SETTINGS)); break;
                 }
             }, null);
     }
