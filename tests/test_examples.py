@@ -2,7 +2,6 @@
 
 Run from the repository root: python3 -m unittest discover -s tests -v
 """
-import os
 import re
 from pathlib import Path
 import unittest
@@ -67,21 +66,13 @@ class ExampleListsTest(unittest.TestCase):
                          "examples/README.md rows and examples/ folders differ")
         self.assertEqual(len(listed), len(set(listed)), "a folder is listed twice")
 
-    def test_readme_table_has_one_row_per_list(self):
-        readme_rows = table_rows(ROOT / "README.md", "| TV | OS |")
-        example_rows = table_rows(EXAMPLES / "README.md", "| Folder |")
-        self.assertEqual(len(readme_rows), len(example_rows),
-                         "README.md TV table and examples/README.md have a different number of rows")
-        readme_tvs = sorted(r.split("|")[1].strip() for r in readme_rows)
-        example_tvs = sorted(r.split("|")[2].strip() for r in example_rows)
-        self.assertEqual(readme_tvs, example_tvs, "the TV column differs between the two tables")
-
-    @unittest.skipUnless(os.environ.get("CLEANYOURTV_STRICT"), "counts are fixed up on merge; strict on main only")
-    def test_readme_counts(self):
-        text = (ROOT / "README.md").read_text(encoding="utf-8")
-        n = len(folders())
-        self.assertIn(f"{n} TV lists", text, "nav link count is stale")
-        self.assertIn(f"{n} TVs with tested lists", text, "numbers line is stale")
+    def test_main_readme_has_launcher_links(self):
+        """The fork's README describes the launcher, not the upstream TV-list index."""
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertIn("TV-Launcher Min", readme)
+        self.assertIn("com.gathin.tvhome", readme)
+        self.assertIn("releases", readme)
+        self.assertIn("docs/XIAOMI-BOX-S-2ND-GEN.md", readme)
 
 
 if __name__ == "__main__":
