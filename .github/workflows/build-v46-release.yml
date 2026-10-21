@@ -1,0 +1,85 @@
+name: Build signed TV-Launcher v4.6 Release
+
+on:
+  push:
+    branches:
+      - feature/v4.6-install-cpu
+    paths:
+      - '.github/workflows/build-v46-release.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  signed-release:
+    runs-on: ubuntu-latest
+    environment: release-signing
+    timeout-minutes: 25
+    steps:
+      - name: Checkout selected branch
+        uses: actions/checkout@v4
+
+      - name: Configure Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Configure Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+
+      - name: Install Android SDK 34
+        run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Restore signing credentials
+        shell: bash
+        env:
+          KEYSTORE_BASE64: ${{ secrets.TV_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.TV_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.TV_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.TV_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$KEYSTORE_BASE64" && test -n "$STORE_PASSWORD"
+          test -n "$KEY_ALIAS" && test -n "$KEY_PASSWORD"
+          umask 077
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/tv-launcher-release.jks"
+          {
+            printf 'storeFile=%s\n' "$RUNNER_TEMP/tv-launcher-release.jks"
+            printf 'storePassword=%s\n' "$STORE_PASSWORD"
+            printf 'keyAlias=%s\n' "$KEY_ALIAS"
+            printf 'keyPassword=%s\n' "$KEY_PASSWORD"
+          } > launcher/signing.properties
+
+      - name: Compile signed Release
+        working-directory: launcher
+        run: bash ./gradlew clean assembleRelease --no-daemon --console=plain
+
+      - name: Verify signed APK identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="launcher/app/build/outputs/apk/release/tv-launcher.apk"
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK"
+          ACTUAL=$("$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --print-certs "$APK" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
+          EXPECTED="8fe6773542f4b40c7a43f06a28989ab73841c0413741c16131ef9472d57fe4ae"
+          test "$ACTUAL" = "$EXPECTED" || { echo 'Unexpected Release signing certificate'; exit 1; }
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" | grep -E "^package: name='com.gathin.tvhome' versionCode='12' versionName='4.6'"
+
+      - name: Upload signed Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: tv-launcher-v4.6-release-signed
+          path: launcher/app/build/outputs/apk/release/tv-launcher.apk
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Remove temporary signing credentials
+        if: always()
+        shell: bash
+        run: |
+          rm -f launcher/signing.properties "$RUNNER_TEMP/tv-launcher-release.jks"
