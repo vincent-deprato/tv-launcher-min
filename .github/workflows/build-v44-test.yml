@@ -1,0 +1,44 @@
+name: Build TV-Launcher v4.4 test APK
+
+on:
+  push:
+    branches:
+      - feature/v4.4
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Configure Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+
+      - name: Install Android SDK 34
+        run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Build test APK (debug signing only)
+        working-directory: launcher
+        run: bash ./gradlew assembleDebug --no-daemon --console=plain
+
+      - name: Publish downloadable test APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: tv-launcher-v4.4-debug
+          path: launcher/app/build/outputs/apk/debug/tv-launcher.apk
+          if-no-files-found: error
+          retention-days: 14
