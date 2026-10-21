@@ -21,6 +21,8 @@ android {
         versionName '4.4'
     }
 
+    buildFeatures { buildConfig true }
+
     signingConfigs {
         release {
             if (signingFile.isFile()) {
