@@ -198,6 +198,8 @@ La clé privée utilisée pour signer les Releases publiques **n'est pas fournie
 
 La v4.6.0 améliore le parcours d'autorisation d'installation sur Google TV avec des choix explicites pour ouvrir les paramètres ou tenter l'installateur Android. Certains firmwares peuvent toujours nécessiter ADB. Le diagnostic CPU affiche désormais le nombre de cœurs, la durée de mesure et précise si les valeurs concernent l'ensemble du système ou seulement TV-Launcher.
 
+**Validation Xiaomi TV Box S 2e génération :** mise à jour intégrée v4.5 → v4.6, installation Android, nouveau diagnostic CPU et redémarrage avec HOME conservé : **OK**. **Reste à confirmer sur Sony Bravia :** autorisation d'installation d'une mise à jour sans ADB lorsque cette source n'a pas encore été autorisée. Le test Xiaomi ne valide pas ce cas car l'autorisation était déjà accordée.
+
 ### 🆕 v4.5 — diagnostic CPU et test des mises à jour
 
 La v4.5.0 apporte une **barre graphique d'utilisation CPU** dans **Paramètres → Diagnostic RAM, CPU et stockage**. La mesure ponctuelle (~650 ms) ne nécessite pas de service résident. Android peut restreindre la mesure CPU globale ; dans ce cas, l'application affiche explicitement la mesure CPU propre à TV-Launcher. **La Release officielle 4.5.0 est disponible** et peut servir au premier test de mise à jour directement depuis la v4.4.
@@ -387,6 +389,8 @@ Public releases use a private signing key **not included** in the repository. De
 ### 🆕 v4.6 — Android install permissions and CPU details
 
 v4.6.0 improves the Google TV update permission flow with explicit options to open settings or try Android's package installer. Some OEM firmwares may still require ADB. CPU diagnostics now show the available core count, measurement duration and whether usage is system-wide or limited to TV-Launcher.
+
+**Xiaomi TV Box S 2nd gen verified:** in-app v4.5 → v4.6 update, Android installation, updated CPU diagnostics, and reboot with HOME preserved. **Still pending on Sony Bravia:** unknown-source installer permission without ADB when the source has not previously been authorized. This was not covered by the Xiaomi test because permission was already granted.
 
 ### 🆕 v4.5 — CPU diagnostics and updater test
 
