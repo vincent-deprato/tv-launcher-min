@@ -194,6 +194,12 @@ APK généré : `launcher/app/build/outputs/apk/debug/tv-launcher.apk`.
 
 La clé privée utilisée pour signer les Releases publiques **n'est pas fournie dans le dépôt**. Les APK debug ne sont pas destinés à la distribution publique.
 
+### 🧪 v4.4 — mise à jour intégrée (version de test)
+
+La v4.4 ajoute la recherche manuelle et hebdomadaire des Releases GitHub, le téléchargement d'un APK officiel avec contrôles SHA-256/signature et l'installation après confirmation Android. **L'APK Release signé a été compilé et vérifié** ; un test d'installation et de redémarrage est positif. **Le parcours complet de mise à jour depuis une nouvelle Release reste à tester** avant publication officielle. La **v4.3.0 reste la version publique stable**.
+
+[Suivre la préparation v4.4](https://github.com/vincent-deprato/tv-launcher-min/pull/2) · [Télécharger l'APK v4.4 signé pour test](https://github.com/vincent-deprato/tv-launcher-min/actions/runs/39519597485)
+
 ### 🧪 Version 4.3 — validation Xiaomi Google TV
 
 Le build **v4.3 signé** a été testé sur **Xiaomi TV Box S 2e génération** (`MiTV-AFKR0`, Android 11, firmware `773`) : grille, masquage, diagnostic RAM/stockage et persistance des préférences. Le launcher reste sélectionné après redémarrage et la touche **Home** fonctionne.
@@ -361,6 +367,12 @@ $env:ANDROID_HOME = "PATH_TO_YOUR_ANDROID_SDK"
 Debug APK: `launcher/app/build/outputs/apk/debug/tv-launcher.apk`.
 
 Public releases use a private signing key **not included** in the repository. Debug APKs are not recommended for public distribution.
+
+### 🧪 v4.4 — in-app updates (test build)
+
+v4.4 adds manual and weekly GitHub Release checks, secure APK download with SHA-256/certificate checks and installation after Android user confirmation. The **signed Release test APK passed its build verification**, and an installation/reboot smoke test passed. **A complete newer-release download and install test is still outstanding** before public publication. **v4.3.0 remains the stable public release.**
+
+[Track v4.4 development](https://github.com/vincent-deprato/tv-launcher-min/pull/2) · [Signed v4.4 test APK](https://github.com/vincent-deprato/tv-launcher-min/actions/runs/39519597485)
 
 ### 🧪 Version 4.3 — Xiaomi Google TV validation
 
