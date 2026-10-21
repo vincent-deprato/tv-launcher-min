@@ -1,0 +1,31 @@
+name: Fix v4.5.0 updater release metadata
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/fix-v45-release-metadata.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix-notes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Make Android versionCode machine-readable
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release view 4.5.0 --repo vincent-deprato/tv-launcher-min --json body --jq .body > "$RUNNER_TEMP/current.md"
+          python3 - "$RUNNER_TEMP/current.md" "$RUNNER_TEMP/fixed.md" <<'PY'
+          import pathlib, re, sys
+          body = pathlib.Path(sys.argv[1]).read_text()
+          body = re.sub(r'(?m)^\\*\\*Android-VersionCode:\\s*11\\*\\*\\s*$', 'Android-VersionCode: 11', body)
+          if not re.search(r'(?m)^Android-VersionCode: 11$', body):
+              body = 'Android-VersionCode: 11\\n\\n' + body
+          pathlib.Path(sys.argv[2]).write_text(body)
+          PY
+          gh release edit 4.5.0 --repo vincent-deprato/tv-launcher-min --notes-file "$RUNNER_TEMP/fixed.md"
+          gh release view 4.5.0 --repo vincent-deprato/tv-launcher-min --json body --jq .body | grep -x 'Android-VersionCode: 11'
