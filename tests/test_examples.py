@@ -2,6 +2,7 @@
 
 Run from the repository root: python3 -m unittest discover -s tests -v
 """
+import os
 import re
 from pathlib import Path
 import unittest
