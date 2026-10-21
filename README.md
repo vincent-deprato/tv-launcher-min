@@ -8,9 +8,9 @@ Projet communautaire basé sur [CleanYourTV](https://github.com/Gathin23/cleanyo
 
 [🇫🇷 Français](#-français) · [🇬🇧 English](#-english)
 
-**Version du code :** 4.4.0 · **Android :** 8.0+ · **Dernière Release publique :** 4.3.0
+**Version actuelle :** 4.4.0 · **Android :** 8.0+ · **Statut :** Release publique stable
 
-**[⬇️ Télécharger v4.3.0 (dernière Release publique)](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.3.0/tv-launcher.apk)** · **[📦 Build v4.4.0 signé à tester](https://github.com/vincent-deprato/tv-launcher-min/actions/runs/39519597485)** · [📦 Toutes les versions](https://github.com/vincent-deprato/tv-launcher-min/releases)
+**[⬇️ Télécharger TV-Launcher Min v4.4.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.4.0/tv-launcher.apk)** · [📦 Toutes les versions](https://github.com/vincent-deprato/tv-launcher-min/releases)
 
 ![TV-Launcher Min v4.2.0 — écran d'accueil sur Sony Bravia](https://github.com/user-attachments/assets/1fdadb7a-4a3a-49af-9b41-ab5b42b9f3c3)
 
@@ -64,7 +64,7 @@ Captures historiques de la **Release v4.2.0**, réalisées sur Sony Bravia (l'in
 
 ### 📥 Téléchargement et installation
 
-**[Télécharger tv-launcher.apk — v4.3.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.3.0/tv-launcher.apk)**
+**[Télécharger tv-launcher.apk — v4.4.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.4.0/tv-launcher.apk)**
 
 Deux méthodes sont possibles. **Ne désactivez pas le launcher constructeur sans avoir validé une procédure spécifique à votre modèle, ainsi qu'une méthode de restauration** : testez d'abord TV-Launcher Min et assurez-vous de pouvoir revenir à l'accueil d'origine. Sur certaines box Google TV, forcer HOME nécessite de désactiver des composants système avec un risque de perte du Wi-Fi et des raccourcis télécommande. [Procédure Xiaomi validée sur firmware 773](docs/XIAOMI-BOX-S-2ND-GEN.md).
 
@@ -196,7 +196,7 @@ La clé privée utilisée pour signer les Releases publiques **n'est pas fournie
 
 ### 🆕 v4.4 — mises à jour directement dans TV-Launcher
 
-**Version 4.4.0 intégrée dans `main`, APK Release signé et contrôlé (versionCode 10), installation et redémarrage validés sur l'appareil de test.** La **Release GitHub 4.4.0 n'est pas encore publiée** : le téléchargement public stable pointe donc toujours vers la 4.3.0.
+**Version 4.4.0 officiellement publiée**, APK Release signé et contrôlé (versionCode 10), installation et redémarrage validés sur l'appareil de test.
 
 - **Paramètres TV-Launcher → Rechercher une mise à jour** : consultation manuelle de la dernière Release GitHub stable.
 - **Recherche discrète environ une fois par semaine** lors du démarrage de l'accueil, sans service en arrière-plan permanent.
@@ -206,7 +206,7 @@ La clé privée utilisée pour signer les Releases publiques **n'est pas fournie
 
 **À tester encore :** détecter puis installer de bout en bout une Release plus récente depuis l'application. Les boutons rapides Netflix, Prime Video, YouTube et Apps restent indisponibles sur la Xiaomi si le launcher Google TV est désactivé.
 
-[Guide technique de mise à jour](docs/UPDATER-V4.4.md) · [Build v4.4 signé (artefact GitHub Actions)](https://github.com/vincent-deprato/tv-launcher-min/actions/runs/39519597485)
+[Guide technique de mise à jour](docs/UPDATER-V4.4.md) · [Release officielle v4.4.0](https://github.com/vincent-deprato/tv-launcher-min/releases/tag/4.4.0)
 
 ### 🧪 Version 4.3 — validation Xiaomi Google TV
 
@@ -220,7 +220,7 @@ Le build **v4.3 signé** a été testé sur **Xiaomi TV Box S 2e génération** 
 
 | Élément | Valeur |
 |---|---|
-| Version du code | 4.4.0 (versionCode 10) |
+| Version | 4.4.0 (versionCode 10) |
 | Identifiant Android | `com.gathin.tvhome` |
 | Android minimum | API 26 — Android 8.0 |
 | Target SDK | API 29 |
@@ -282,7 +282,7 @@ Historical screenshots from the **v4.2.0 Release**, captured on Sony Bravia (v4.
 
 ### 📥 Download and installation
 
-**[Download tv-launcher.apk — v4.3.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.3.0/tv-launcher.apk)**
+**[Download tv-launcher.apk — v4.4.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.4.0/tv-launcher.apk)**
 
 **Without a computer:** download the APK from GitHub, transfer it to the TV by USB drive or a compatible file manager, allow installation from that source if prompted, install it, and open TV-Launcher Min. Select it as the default Home app if Android offers that option.
 
@@ -378,7 +378,7 @@ Public releases use a private signing key **not included** in the repository. De
 
 ### 🆕 v4.4 — in-app GitHub updates
 
-**Version 4.4.0 has been merged into `main`; its signed Release APK (Android versionCode 10) passed certificate checks, and an installation/reboot smoke test passed.** The **4.4.0 GitHub Release has not yet been published**, so the official stable download still points to 4.3.0.
+**Version 4.4.0 is officially released.** Its signed Release APK (Android versionCode 10) passed certificate checks, and an installation/reboot smoke test passed.
 
 - **TV-Launcher Settings → Check for updates** to manually check the latest stable GitHub Release.
 - Quiet weekly check when Home starts, with no always-on service.
@@ -388,7 +388,7 @@ Public releases use a private signing key **not included** in the repository. De
 
 **Still to test:** complete detection and installation of a newer stable GitHub Release from within the launcher. Xiaomi's dedicated remote shortcuts do not work when the original Google TV launcher is disabled.
 
-[Updater technical guide](docs/UPDATER-V4.4.md) · [Signed v4.4 build (GitHub Actions artifact)](https://github.com/vincent-deprato/tv-launcher-min/actions/runs/39519597485)
+[Updater technical guide](docs/UPDATER-V4.4.md) · [Official v4.4.0 release](https://github.com/vincent-deprato/tv-launcher-min/releases/tag/4.4.0)
 
 ### 🧪 Version 4.3 — Xiaomi Google TV validation
 
