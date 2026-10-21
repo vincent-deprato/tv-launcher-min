@@ -14,31 +14,35 @@ final class CpuSampler {
     static final class Result {
         final int percent;
         final boolean systemWide;
-        Result(int percent, boolean systemWide) {
+        final int cores;
+        final long sampleMs;
+        Result(int percent, boolean systemWide, int cores, long sampleMs) {
             this.percent = Math.max(0, Math.min(100, percent));
             this.systemWide = systemWide;
+            this.cores = cores;
+            this.sampleMs = sampleMs;
         }
     }
 
     static Result measure() throws InterruptedException {
+        int cores = Math.max(1, Runtime.getRuntime().availableProcessors());
         long[] first = readSystem();
         long processStart = Process.getElapsedCpuTime();
         long start = SystemClock.elapsedRealtime();
         Thread.sleep(650);
+        long elapsed = Math.max(1, SystemClock.elapsedRealtime() - start);
         long[] second = first == null ? null : readSystem();
         if (first != null && second != null) {
             long total = second[0] - first[0];
             long idle = second[1] - first[1];
             if (total > 0 && idle >= 0 && idle <= total)
-                return new Result((int) Math.round((total - idle) * 100.0 / total), true);
+                return new Result((int) Math.round((total - idle) * 100.0 / total), true, cores, elapsed);
         }
         // /proc/stat may be blocked by Android SELinux. Show *this application's*
         // normalized CPU usage instead of incorrectly labeling it system CPU.
-        long elapsed = SystemClock.elapsedRealtime() - start;
         long cpu = Process.getElapsedCpuTime() - processStart;
-        int cores = Math.max(1, Runtime.getRuntime().availableProcessors());
         double fraction = elapsed > 0 ? cpu * 100.0 / (elapsed * cores) : 0;
-        return new Result((int) Math.round(fraction), false);
+        return new Result((int) Math.round(fraction), false, cores, elapsed);
     }
 
     /** total, idle (idle plus iowait) from aggregate cpu line in /proc/stat. */
