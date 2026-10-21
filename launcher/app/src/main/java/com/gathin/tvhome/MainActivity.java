@@ -204,7 +204,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     /** Lightweight on-demand settings, no background service or resident monitoring. */
     private void showLauncherSettings() {
         CompactMenu.show(this, "Paramètres TV-Launcher",
-            new String[]{"Organiser et masquer les applications", "Diagnostic RAM et stockage", "Rechercher une mise à jour (v" + BuildConfig.VERSION_NAME + ")", "Paramètres Android de la TV"},
+            new String[]{"Organiser et masquer les applications", "Diagnostic RAM, CPU et stockage", "Rechercher une mise à jour (v" + BuildConfig.VERSION_NAME + ")", "Paramètres Android de la TV"},
             new String[]{"▦", "◫", "↓", "⚙"},
             -1, choice -> {
                 switch (choice) {
@@ -256,6 +256,39 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         ramDetail.setPadding(0, 0, 0, pad);
         content.addView(ramDetail);
 
+        // Sample CPU once on a worker thread; never block the HOME UI.
+        TextView cpuTitle = new TextView(this);
+        cpuTitle.setText("CPU : mesure en cours…");
+        cpuTitle.setTextColor(Color.WHITE);
+        cpuTitle.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        cpuTitle.setTextSize(17);
+        content.addView(cpuTitle);
+        ProgressBar cpuBar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
+        cpuBar.setMax(100);
+        cpuBar.setProgressTintList(android.content.res.ColorStateList.valueOf(0xFFE5B77A));
+        cpuBar.setProgressBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFF354963));
+        LinearLayout.LayoutParams cpuParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                Math.round(12 * getResources().getDisplayMetrics().density));
+        cpuParams.topMargin = Math.round(8 * getResources().getDisplayMetrics().density);
+        cpuParams.bottomMargin = Math.round(10 * getResources().getDisplayMetrics().density);
+        content.addView(cpuBar, cpuParams);
+        new Thread(() -> {
+            try {
+                CpuSampler.Result sample = CpuSampler.measure();
+                runOnUiThread(() -> {
+                    if (!isFinishing() && !isDestroyed()) {
+                        cpuTitle.setText((sample.systemWide ? "Utilisation CPU système" :
+                                "CPU TV-Launcher (système inaccessible)") + "   " + sample.percent + "%");
+                        cpuBar.setProgress(sample.percent);
+                    }
+                });
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                runOnUiThread(() -> cpuTitle.setText("CPU : mesure indisponible"));
+            }
+        }, "cpu-diagnostic").start();
+
         addDiagnosticBar(content, "Stockage interne", diskTotal - diskFree, diskTotal, 0xFF77D9C0);
         TextView diskDetail = new TextView(this);
         diskDetail.setText("Disponible : " + Formatter.formatShortFileSize(this, diskFree));
@@ -273,7 +306,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         content.addView(status);
 
         TextView note = new TextView(this);
-        note.setText("Mesure instantanée · sans surveillance en arrière-plan");
+        note.setText("Mesure CPU sur ~650 ms · sans surveillance en arrière-plan");
         note.setTextColor(0xFF9EB6D1);
         note.setTextSize(12);
         content.addView(note);
