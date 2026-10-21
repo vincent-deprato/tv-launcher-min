@@ -66,6 +66,17 @@ class ExampleListsTest(unittest.TestCase):
                          "examples/README.md rows and examples/ folders differ")
         self.assertEqual(len(listed), len(set(listed)), "a folder is listed twice")
 
+    def test_readme_local_links_and_images(self):
+        """Avoid publishing broken relative links in the repository landing page."""
+        text = (ROOT / "README.md").read_text(encoding="utf-8")
+        targets = re.findall(r"!?(?:\\[[^\\]]*\\])\\(([^)]+)\\)", text)
+        for target in targets:
+            target = target.split("#", 1)[0]
+            if not target or target.startswith(("https://", "http://", "mailto:")):
+                continue
+            with self.subTest(target=target):
+                self.assertTrue((ROOT / target).is_file(), f"Missing README target: {target}")
+
     def test_launcher_readme(self):
         """The fork README documents TV-Launcher, not upstream TV list tables."""
         text = (ROOT / "README.md").read_text(encoding="utf-8")
