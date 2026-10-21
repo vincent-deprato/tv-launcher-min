@@ -19,7 +19,9 @@
 
 ### Aperçu du diagnostic
 
-![Menu diagnostic RAM CPU stockage — v4.5 sur Xiaomi TV Box](docs/images/diagnostic-cpu-v46.webp)
+![Aperçu des fonctionnalités du launcher — capture historique](https://github.com/user-attachments/assets/3030eb60-a677-4c5d-b8f9-be658d0e28ac)
+
+*La capture du diagnostic CPU v4.6 sera ajoutée ici dès que son fichier image sera disponible dans le dépôt.*
 
 ### Installer en trois étapes
 
