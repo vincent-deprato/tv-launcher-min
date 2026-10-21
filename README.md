@@ -207,6 +207,11 @@ La clé privée utilisée pour signer les Releases publiques **n'est pas fournie
 **Validation restante :** le cycle complet *nouvelle Release détectée → téléchargement → confirmation Android → mise à jour* n'a pas encore été testé de bout en bout. Les boutons rapides Xiaomi restent indisponibles lorsque le launcher Google TV d'origine est désactivé.
 
 [Guide technique et scénarios de test v4.4](docs/UPDATER-V4.4.md) · [APK Release v4.4 signé (artefact de test GitHub Actions)](https://github.com/vincent-deprato/tv-launcher-min/actions/runs/39519597485)
+### 🧪 v4.4 — mise à jour intégrée (version de test)
+
+La v4.4 ajoute la recherche manuelle et hebdomadaire des Releases GitHub, le téléchargement d'un APK officiel avec contrôles SHA-256/signature et l'installation après confirmation Android. **L'APK Release signé a été compilé et vérifié** ; un test d'installation et de redémarrage est positif. **Le parcours complet de mise à jour depuis une nouvelle Release reste à tester** avant publication officielle. La **v4.3.0 reste la version publique stable**.
+
+[Suivre la préparation v4.4](https://github.com/vincent-deprato/tv-launcher-min/pull/2) · [Télécharger l'APK v4.4 signé pour test](https://github.com/vincent-deprato/tv-launcher-min/actions/runs/39519597485)
 
 ### 🧪 Version 4.3 — validation Xiaomi Google TV
 
@@ -276,7 +281,7 @@ Historical screenshots from the **v4.2.0 Release**, captured on Sony Bravia (v4.
   </tr>
   <tr>
     <td width="50%"><img src="https://github.com/user-attachments/assets/d303019e-0cea-415c-8d41-555daf4abd79" alt="TV-Launcher Min v4.2.0 — feature screenshot 3" width="100%" /></td>
-    <td width="50%"><img src="https://github.com/user-attachments/assets/dbede6d9-b3fd-453e-aeea-48528b8eca68" alt="TV-Launcher Min v4.2.0 — feature screenshot 4" width="100%" /></td>
+    <td width="50%"><img src="https://github.com/vincent-deprato/tv-launcher-min/blob/55d3b463deb1e183765c5467ecddec91135531c0/docs/images/192-168-1-31-5555_2026-10-21_01-48-46.png" alt="TV-Launcher Min v4.2.0 — feature screenshot 4" width="100%" /></td>
   </tr>
 </table>
 
@@ -389,6 +394,11 @@ Public releases use a private signing key **not included** in the repository. De
 **Not yet validated:** a full end-to-end upgrade from a newly available stable GitHub Release. Xiaomi dedicated remote shortcut buttons remain unavailable when the stock Google TV launcher is disabled.
 
 [Updater implementation and test plan](docs/UPDATER-V4.4.md) · [Signed v4.4 test APK (GitHub Actions artifact)](https://github.com/vincent-deprato/tv-launcher-min/actions/runs/39519597485)
+### 🧪 v4.4 — in-app updates (test build)
+
+v4.4 adds manual and weekly GitHub Release checks, secure APK download with SHA-256/certificate checks and installation after Android user confirmation. The **signed Release test APK passed its build verification**, and an installation/reboot smoke test passed. **A complete newer-release download and install test is still outstanding** before public publication. **v4.3.0 remains the stable public release.**
+
+[Track v4.4 development](https://github.com/vincent-deprato/tv-launcher-min/pull/2) · [Signed v4.4 test APK](https://github.com/vincent-deprato/tv-launcher-min/actions/runs/39519597485)
 
 ### 🧪 Version 4.3 — Xiaomi Google TV validation
 
