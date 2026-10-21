@@ -8,9 +8,9 @@ Projet communautaire basé sur [CleanYourTV](https://github.com/Gathin23/cleanyo
 
 [🇫🇷 Français](#-français) · [🇬🇧 English](#-english)
 
-**Version actuelle :** 4.5.0 · **Android :** 8.0+ · **Statut :** Release publique stable
+**Version actuelle :** 4.6.0 · **Android :** 8.0+ · **Statut :** Release publique stable
 
-**[⬇️ Télécharger TV-Launcher Min v4.5.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.5.0/tv-launcher.apk)** · [📦 Toutes les versions](https://github.com/vincent-deprato/tv-launcher-min/releases)
+**[⬇️ Télécharger TV-Launcher Min v4.6.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.6.0/tv-launcher.apk)** · [📦 Toutes les versions](https://github.com/vincent-deprato/tv-launcher-min/releases)
 
 ![TV-Launcher Min v4.2.0 — écran d'accueil sur Sony Bravia](https://github.com/user-attachments/assets/1fdadb7a-4a3a-49af-9b41-ab5b42b9f3c3)
 
@@ -20,7 +20,7 @@ Projet communautaire basé sur [CleanYourTV](https://github.com/Gathin23/cleanyo
 
 ### ✨ Présentation
 
-**TV-Launcher Min v4.5.0** personnalise CleanYourTV pour proposer un écran d'accueil Android TV épuré, fluide et utilisable entièrement à la télécommande.
+**TV-Launcher Min v4.6.0** personnalise CleanYourTV pour proposer un écran d'accueil Android TV épuré, fluide et utilisable entièrement à la télécommande.
 
 Son objectif : **afficher l'essentiel, faciliter l'accès aux applications et éviter les fonctionnalités exécutées inutilement en arrière-plan.**
 
@@ -64,7 +64,7 @@ Captures historiques de la **Release v4.2.0**, réalisées sur Sony Bravia (l'in
 
 ### 📥 Téléchargement et installation
 
-**[Télécharger tv-launcher.apk — v4.5.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.5.0/tv-launcher.apk)**
+**[Télécharger tv-launcher.apk — v4.6.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.6.0/tv-launcher.apk)**
 
 Deux méthodes sont possibles. **Ne désactivez pas le launcher constructeur sans avoir validé une procédure spécifique à votre modèle, ainsi qu'une méthode de restauration** : testez d'abord TV-Launcher Min et assurez-vous de pouvoir revenir à l'accueil d'origine. Sur certaines box Google TV, forcer HOME nécessite de désactiver des composants système avec un risque de perte du Wi-Fi et des raccourcis télécommande. [Procédure Xiaomi validée sur firmware 773](docs/XIAOMI-BOX-S-2ND-GEN.md).
 
@@ -194,6 +194,10 @@ APK généré : `launcher/app/build/outputs/apk/debug/tv-launcher.apk`.
 
 La clé privée utilisée pour signer les Releases publiques **n'est pas fournie dans le dépôt**. Les APK debug ne sont pas destinés à la distribution publique.
 
+### 🆕 v4.6 — autorisations Android et diagnostic CPU
+
+La v4.6.0 améliore le parcours d'autorisation d'installation sur Google TV avec des choix explicites pour ouvrir les paramètres ou tenter l'installateur Android. Certains firmwares peuvent toujours nécessiter ADB. Le diagnostic CPU affiche désormais le nombre de cœurs, la durée de mesure et précise si les valeurs concernent l'ensemble du système ou seulement TV-Launcher.
+
 ### 🆕 v4.5 — diagnostic CPU et test des mises à jour
 
 La v4.5.0 apporte une **barre graphique d'utilisation CPU** dans **Paramètres → Diagnostic RAM, CPU et stockage**. La mesure ponctuelle (~650 ms) ne nécessite pas de service résident. Android peut restreindre la mesure CPU globale ; dans ce cas, l'application affiche explicitement la mesure CPU propre à TV-Launcher. **La Release officielle 4.5.0 est disponible** et peut servir au premier test de mise à jour directement depuis la v4.4.
@@ -224,7 +228,7 @@ Le build **v4.3 signé** a été testé sur **Xiaomi TV Box S 2e génération** 
 
 | Élément | Valeur |
 |---|---|
-| Version | 4.5.0 (versionCode 11) |
+| Version | 4.6.0 (versionCode 12) |
 | Identifiant Android | `com.gathin.tvhome` |
 | Android minimum | API 26 — Android 8.0 |
 | Target SDK | API 29 |
@@ -251,7 +255,7 @@ TV-Launcher Min est indépendant et n'est ni développé ni approuvé par Sony o
 
 ### ✨ Overview
 
-**TV-Launcher Min v4.5.0** is a lightweight, remote-friendly Android TV home screen based on CleanYourTV. It focuses on fast app access, a clean interface and minimal unnecessary background activity.
+**TV-Launcher Min v4.6.0** is a lightweight, remote-friendly Android TV home screen based on CleanYourTV. It focuses on fast app access, a clean interface and minimal unnecessary background activity.
 
 Tested on **Sony Bravia KD-55XF9005** and **Xiaomi TV Box S 2nd gen** (Google TV 11, firmware 773). Compatibility with other devices is not guaranteed.
 
@@ -286,7 +290,7 @@ Historical screenshots from the **v4.2.0 Release**, captured on Sony Bravia (v4.
 
 ### 📥 Download and installation
 
-**[Download tv-launcher.apk — v4.5.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.5.0/tv-launcher.apk)**
+**[Download tv-launcher.apk — v4.6.0](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.6.0/tv-launcher.apk)**
 
 **Without a computer:** download the APK from GitHub, transfer it to the TV by USB drive or a compatible file manager, allow installation from that source if prompted, install it, and open TV-Launcher Min. Select it as the default Home app if Android offers that option.
 
@@ -379,6 +383,10 @@ $env:ANDROID_HOME = "PATH_TO_YOUR_ANDROID_SDK"
 Debug APK: `launcher/app/build/outputs/apk/debug/tv-launcher.apk`.
 
 Public releases use a private signing key **not included** in the repository. Debug APKs are not recommended for public distribution.
+
+### 🆕 v4.6 — Android install permissions and CPU details
+
+v4.6.0 improves the Google TV update permission flow with explicit options to open settings or try Android's package installer. Some OEM firmwares may still require ADB. CPU diagnostics now show the available core count, measurement duration and whether usage is system-wide or limited to TV-Launcher.
 
 ### 🆕 v4.5 — CPU diagnostics and updater test
 
