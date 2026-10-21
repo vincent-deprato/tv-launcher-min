@@ -1,0 +1,90 @@
+name: Publish TV-Launcher Min v4.4.0
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-v44.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: publish-tv-launcher-4.4.0
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+
+      - name: Install Android build tools
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+
+      - name: Install package inspection tools
+        run: sdkmanager "build-tools;34.0.0"
+
+      - name: Fetch previously signed v4.4 APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/v44"
+          gh run download 39519597485 \
+            --repo vincent-deprato/tv-launcher-min \
+            --name tv-launcher-v4.4-release-signed \
+            --dir "$RUNNER_TEMP/v44"
+          test -s "$RUNNER_TEMP/v44/tv-launcher.apk"
+
+      - name: Verify original signing certificate and Android package version
+        env:
+          EXPECTED_CERT: 8fe6773542f4b40c7a43f06a28989ab73841c0413741c16131ef9472d57fe4ae
+        run: |
+          set -euo pipefail
+          APK="$RUNNER_TEMP/v44/tv-launcher.apk"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose "$APK"
+          ACTUAL=$("$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --print-certs "$APK" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
+          test "$ACTUAL" = "$EXPECTED_CERT" || { echo "Certificate mismatch"; exit 1; }
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" | grep -E "^package: name='com.gathin.tvhome' versionCode='10' versionName='4.4'"
+          sha256sum "$APK"
+
+      - name: Publish stable v4.4.0 release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view 4.4.0 --repo vincent-deprato/tv-launcher-min >/dev/null 2>&1; then
+            echo "Release 4.4.0 already exists; refusing to overwrite it."
+            exit 1
+          fi
+          cat > "$RUNNER_TEMP/release-notes.md" <<'NOTES'
+          ## TV-Launcher Min v4.4.0
+
+          **Android-VersionCode: 10**
+
+          - Mise à jour intégrée depuis GitHub : recherche manuelle dans les paramètres et vérification automatique discrète hebdomadaire.
+          - Téléchargement HTTPS de l'APK officiel avec progression, contrôle SHA-256, vérification du certificat Release, du package et de la version Android.
+          - Installation uniquement après confirmation par Android, sans root.
+          - Conservation des améliorations v4.3 (grille, favoris, diagnostic RAM/stockage).
+
+          **Compatibilité vérifiée :** Sony Bravia KD-55XF9005 et Xiaomi TV Box S 2e génération (Android 11, firmware 773), avec test de mise à jour signée et de redémarrage sur l'appareil de test.
+
+          **Limitations :** sur Xiaomi, les boutons dédiés Netflix, Prime Video, YouTube et Apps ne fonctionnent plus si le launcher Google TV d'origine est désactivé. Le cycle de mise à jour intégré vers une nouvelle Release n'a pas encore été validé de bout en bout.
+
+          **Sécurité :** ne désactivez aucun composant système sans une procédure de récupération adaptée à votre modèle. [Guide Xiaomi](https://github.com/vincent-deprato/tv-launcher-min/blob/main/docs/XIAOMI-BOX-S-2ND-GEN.md).
+
+          Le fichier `tv-launcher.apk` est la version Release signée officielle.
+          NOTES
+          gh release create 4.4.0 "$RUNNER_TEMP/v44/tv-launcher.apk#tv-launcher.apk" \
+            --repo vincent-deprato/tv-launcher-min \
+            --target main \
+            --title "TV-Launcher Min v4.4.0" \
+            --notes-file "$RUNNER_TEMP/release-notes.md" \
+            --latest
