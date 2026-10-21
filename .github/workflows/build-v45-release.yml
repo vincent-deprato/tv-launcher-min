@@ -3,9 +3,9 @@ name: Build signed TV-Launcher v4.5 Release
 on:
   push:
     branches:
-      - feature/v4.5-updater
+      - main
     paths:
-      - '.github/workflows/build-v44-release.yml'
+      - '.github/workflows/build-v45-release.yml'
   workflow_dispatch:
 
 permissions:
