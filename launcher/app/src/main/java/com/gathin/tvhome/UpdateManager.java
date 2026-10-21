@@ -13,7 +13,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.SystemClock;
 import android.provider.Settings;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -53,7 +52,6 @@ final class UpdateManager {
     private final Handler ui = new Handler(Looper.getMainLooper());
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private boolean busy;
-    private Release latest;
 
     private static final class Release {
         final String version;
@@ -103,7 +101,6 @@ final class UpdateManager {
                 }
                 activity.getSharedPreferences(PREFS, Activity.MODE_PRIVATE)
                         .edit().putLong(KEY_CHECKED, System.currentTimeMillis()).apply();
-                latest = result;
                 if (result == null || result.code <= BuildConfig.VERSION_CODE) {
                     if (manual) showMessage("Mise à jour",
                             "TV-Launcher Min " + BuildConfig.VERSION_NAME + " est à jour.");
@@ -317,7 +314,7 @@ final class UpdateManager {
             new AlertDialog.Builder(activity)
                     .setTitle("Autoriser les mises à jour")
                     .setMessage("Android n'autorise pas encore TV-Launcher à proposer une installation. "
-                            + "Ouvrez les paramètres pour autoriser cette source.\\n\\n"
+                            + "Ouvrez les paramètres pour autoriser cette source.\n\n"
                             + "Si TV-Launcher n'apparaît pas dans la liste Google TV, essayez "
                             + "« Ouvrir l'installateur » : Android peut alors demander l'autorisation "
                             + "directement. Selon le firmware, cela peut rester impossible sans ADB.")

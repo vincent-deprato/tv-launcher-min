@@ -22,7 +22,7 @@ La v4.5.0 apporte une **barre graphique d'utilisation CPU** dans **Paramètres �
 
 **À tester encore :** détecter puis installer de bout en bout une Release plus récente depuis l'application. Les boutons rapides Netflix, Prime Video, YouTube et Apps restent indisponibles sur la Xiaomi si le launcher Google TV est désactivé.
 
-[Guide technique de mise à jour](docs/UPDATER-V4.4.md) · [Release officielle v4.4.0](https://github.com/vincent-deprato/tv-launcher-min/releases/tag/4.4.0)
+[Guide technique de mise à jour](UPDATER-V4.4.md) · [Release officielle v4.4.0](https://github.com/vincent-deprato/tv-launcher-min/releases/tag/4.4.0)
 
 ### 🧪 Version 4.3 — validation Xiaomi Google TV
 
@@ -30,7 +30,7 @@ Le build **v4.3 signé** a été testé sur **Xiaomi TV Box S 2e génération** 
 
 **Limitation confirmée :** les touches dédiées **Netflix, Prime Video, YouTube et Apps** ne fonctionnent plus lorsque le launcher Google TV est désactivé. Un remappage est à étudier et n'est pas encore validé sur cette Xiaomi.
 
-**[Procédure Xiaomi détaillée, avertissements Wi-Fi et restauration Google TV](docs/XIAOMI-BOX-S-2ND-GEN.md)**. La méthode ADB comporte un risque de perte de Wi-Fi et d'accueil ; elle n'est pas générale à tous les appareils.
+**[Procédure Xiaomi détaillée, avertissements Wi-Fi et restauration Google TV](XIAOMI-BOX-S-2ND-GEN.md)**. La méthode ADB comporte un risque de perte de Wi-Fi et d'accueil ; elle n'est pas générale à tous les appareils.
 
 ---
 
@@ -56,7 +56,7 @@ v4.5.0 adds an on-demand **CPU usage bar** to **Settings → RAM, CPU and storag
 
 **Still to test:** complete detection and installation of a newer stable GitHub Release from within the launcher. Xiaomi's dedicated remote shortcuts do not work when the original Google TV launcher is disabled.
 
-[Updater technical guide](docs/UPDATER-V4.4.md) · [Official v4.4.0 release](https://github.com/vincent-deprato/tv-launcher-min/releases/tag/4.4.0)
+[Updater technical guide](UPDATER-V4.4.md) · [Official v4.4.0 release](https://github.com/vincent-deprato/tv-launcher-min/releases/tag/4.4.0)
 
 ### 🧪 Version 4.3 — Xiaomi Google TV validation
 
@@ -64,4 +64,4 @@ The **signed v4.3 build** was tested on a **Xiaomi TV Box S 2nd gen** (`MiTV-AFK
 
 **Confirmed limitation:** dedicated **Netflix, Prime Video, YouTube, and Apps** remote keys stopped working after disabling the stock Google TV launcher. Remapping is not yet validated on this device.
 
-**[Xiaomi-specific installation, Wi-Fi risks and Google TV recovery guide](docs/XIAOMI-BOX-S-2ND-GEN.md)**. This ADB procedure is firmware-specific and can interrupt Wi-Fi or HOME.
+**[Xiaomi-specific installation, Wi-Fi risks and Google TV recovery guide](XIAOMI-BOX-S-2ND-GEN.md)**. This ADB procedure is firmware-specific and can interrupt Wi-Fi or HOME.
