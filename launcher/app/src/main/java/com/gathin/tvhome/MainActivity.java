@@ -273,6 +273,12 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         cpuParams.topMargin = Math.round(8 * getResources().getDisplayMetrics().density);
         cpuParams.bottomMargin = Math.round(10 * getResources().getDisplayMetrics().density);
         content.addView(cpuBar, cpuParams);
+        TextView cpuDetail = new TextView(this);
+        cpuDetail.setText("Échantillonnage CPU en cours…");
+        cpuDetail.setTextColor(0xFFB5C9E2);
+        cpuDetail.setTextSize(13);
+        cpuDetail.setPadding(0, 0, 0, pad / 2);
+        content.addView(cpuDetail);
         new Thread(() -> {
             try {
                 CpuSampler.Result sample = CpuSampler.measure();
@@ -281,6 +287,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                         cpuTitle.setText((sample.systemWide ? "Utilisation CPU système" :
                                 "CPU TV-Launcher (système inaccessible)") + "   " + sample.percent + "%");
                         cpuBar.setProgress(sample.percent);
+                        cpuDetail.setText(sample.cores + " cœur(s) disponibles  •  mesure sur "
+                                + sample.sampleMs + " ms"
+                                + (sample.systemWide ? "  •  tous les processus"
+                                        : "  •  application uniquement (restriction Android)"));
                     }
                 });
             } catch (InterruptedException e) {
@@ -306,7 +316,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         content.addView(status);
 
         TextView note = new TextView(this);
-        note.setText("Mesure CPU sur ~650 ms · sans surveillance en arrière-plan");
+        note.setText("CPU : mesure ponctuelle, pas de surveillance permanente.");
         note.setTextColor(0xFF9EB6D1);
         note.setTextSize(12);
         content.addView(note);
