@@ -306,28 +306,60 @@ final class UpdateManager {
         return info.signatures == null ? new Signature[0] : info.signatures;
     }
 
+    /**
+     * Unknown-source permission is controlled by the firmware, not by the app.
+     * Some Google TV builds omit sideloaded launchers from the permission list.
+     * Never silently grant app-ops or claim we can bypass the Android installer.
+     */
     private void install(File apk) {
+        if (Build.VERSION.SDK_INT >= 26
+                && !activity.getPackageManager().canRequestPackageInstalls()) {
+            new AlertDialog.Builder(activity)
+                    .setTitle("Autoriser les mises à jour")
+                    .setMessage("Android n'autorise pas encore TV-Launcher à proposer une installation. "
+                            + "Ouvrez les paramètres pour autoriser cette source.\\n\\n"
+                            + "Si TV-Launcher n'apparaît pas dans la liste Google TV, essayez "
+                            + "« Ouvrir l'installateur » : Android peut alors demander l'autorisation "
+                            + "directement. Selon le firmware, cela peut rester impossible sans ADB.")
+                    .setPositiveButton("Paramètres Android", (d, w) -> openUnknownSourceSettings())
+                    .setNeutralButton("Ouvrir l'installateur", (d, w) -> launchInstaller(apk))
+                    .setNegativeButton("Plus tard", null)
+                    .show();
+            return;
+        }
+        launchInstaller(apk);
+    }
+
+    private void openUnknownSourceSettings() {
+        try {
+            Intent settings = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                    Uri.parse("package:" + activity.getPackageName()));
+            activity.startActivity(settings);
+        } catch (ActivityNotFoundException | SecurityException e) {
+            try {
+                activity.startActivity(new Intent(Settings.ACTION_SECURITY_SETTINGS));
+            } catch (ActivityNotFoundException | SecurityException ignored) {
+                showMessage("Paramètres indisponibles",
+                        "Votre firmware ne permet pas d'ouvrir l'autorisation d'installation depuis TV-Launcher.");
+            }
+        }
+    }
+
+    private void launchInstaller(File apk) {
         try {
             Uri uri = FileProvider.getUriForFile(activity,
                     activity.getPackageName() + ".fileprovider", apk);
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setDataAndType(uri, "application/vnd.android.package-archive");
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
-            if (Build.VERSION.SDK_INT >= 26
-                    && !activity.getPackageManager().canRequestPackageInstalls()) {
-                showMessage("Autorisation Android requise",
-                        "Autorisez l'installation depuis TV-Launcher dans les paramètres Android, "
-                                + "puis relancez la mise à jour.");
-                Intent settings = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-                        Uri.parse("package:" + activity.getPackageName()));
-                activity.startActivity(settings);
-                return;
-            }
-            activity.startActivity(intent); // Android asks for user confirmation
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            // Carry a ClipData grant for OEM Package Installer implementations.
+            intent.setClipData(android.content.ClipData.newRawUri("TV-Launcher APK", uri));
+            activity.startActivity(intent); // Android always owns the confirmation.
         } catch (ActivityNotFoundException | SecurityException e) {
-            showMessage("Installation impossible", "L'installateur Android est indisponible : " + e.getMessage());
+            showMessage("Installation impossible",
+                    "L'installateur Android ne peut pas ouvrir l'APK : " + e.getMessage());
         } catch (IllegalArgumentException e) {
-            showMessage("Installation impossible", "Fichier APK inaccessible");
+            showMessage("Installation impossible", "Le fichier APK n'est pas accessible.");
         }
     }
 
