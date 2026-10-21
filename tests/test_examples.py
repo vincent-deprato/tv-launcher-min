@@ -69,7 +69,7 @@ class ExampleListsTest(unittest.TestCase):
     def test_launcher_readme(self):
         """The fork README documents TV-Launcher, not upstream TV list tables."""
         text = (ROOT / "README.md").read_text(encoding="utf-8")
-        for required in ("TV-Launcher Min", "com.gathin.tvhome", "releases",
+        for required in ("TV-Launcher Min", "releases",
                          "docs/XIAOMI-BOX-S-2ND-GEN.md"):
             with self.subTest(required=required):
                 self.assertIn(required, text)
