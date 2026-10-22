@@ -37,8 +37,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -131,14 +133,26 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.Holder> {
             String label = String.valueOf(ri.loadLabel(pm));
             fresh.add(new Entry(label, new ComponentName(pkg, ri.activityInfo.name), banner, icon));
         }
+        // Index the saved positions once rather than repeatedly scanning lists during sorting.
+        // These maps exist only for this reload and do not retain any application resources.
+        Map<String, Integer> favouritePositions = new HashMap<>();
+        for (int i = 0; i < favourites.size(); i++) {
+            favouritePositions.putIfAbsent(favourites.get(i), i);
+        }
+        Map<String, Integer> gridPositions = new HashMap<>();
+        for (int i = 0; i < customOrder.size(); i++) {
+            gridPositions.putIfAbsent(customOrder.get(i), i);
+        }
         Collections.sort(fresh, (a, b) -> {
-            int fa = favourites.indexOf(a.pkg), fb = favourites.indexOf(b.pkg);
+            int fa = favouritePositions.containsKey(a.pkg) ? favouritePositions.get(a.pkg) : -1;
+            int fb = favouritePositions.containsKey(b.pkg) ? favouritePositions.get(b.pkg) : -1;
             if (fa >= 0 || fb >= 0) {
                 if (fa < 0) return 1;
                 if (fb < 0) return -1;
                 return Integer.compare(fa, fb);
             }
-            int ia = customOrder.indexOf(a.pkg), ib = customOrder.indexOf(b.pkg);
+            int ia = gridPositions.containsKey(a.pkg) ? gridPositions.get(a.pkg) : -1;
+            int ib = gridPositions.containsKey(b.pkg) ? gridPositions.get(b.pkg) : -1;
             if (ia >= 0 || ib >= 0) {
                 if (ia < 0) return 1;
                 if (ib < 0) return -1;
