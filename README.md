@@ -33,7 +33,7 @@
 
 ### Appareils testés
 
-**Sony Bravia KD-55XF9005** (Android TV) et **Xiaomi TV Box S 2e génération** (Google TV 11, firmware 773). Sur Xiaomi, la mise à jour intégrée v4.5 → v4.6, le diagnostic CPU et la persistance de HOME après redémarrage ont été validés. Le parcours d'autorisation initiale sans ADB reste à confirmer sur Sony.
+**Sony Bravia KD-55XF9005** (Android TV) et **Xiaomi TV Box S 2e génération** (Google TV 11, firmware 773). Sur Xiaomi, la mise à jour intégrée v4.5 → v4.6, le diagnostic CPU et la persistance de HOME après redémarrage ont été validés. **Tous les tests prévus sur Sony Bravia ont également été confirmés réussis**, y compris le parcours d'installation et d'autorisation sans ADB. Ces validations portent sur les appareils testés, pas sur tous les firmwares.
 
 ## 🇬🇧 English
 
