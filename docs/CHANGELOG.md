@@ -6,13 +6,13 @@
 
 La série **v4.2.0 à v4.8.0 correspond aux versions de développement et de validation**, désormais distinguées de la version stable sur GitHub. Les tags historiques restent accessibles.
 
-**Recette préalable (v4.6 → v4.8) :** mise à jour intégrée réussie sur Sony Bravia et Xiaomi TV Box S 2e génération ; favoris et ensemble des paramètres conservés sur les appareils testés. L'autorisation Android d'installer des APK a été demandée sur Sony avant que la mise à jour soit possible. **Validation encore requise :** mise à jour effective v4.8 → v1.0.0 après publication, afin de confirmer également le changement de numérotation.
+**Recette préalable (v4.6 → v4.8) :** mise à jour intégrée réussie sur Sony Bravia et Xiaomi TV Box S 2e génération ; favoris et ensemble des paramètres conservés sur les appareils testés. L'autorisation Android d'installer des APK a été demandée sur Sony avant que la mise à jour soit possible. **Validation finale (24 octobre 2026) :** migration effective **v4.8 → v1.0.0 réussie sur Xiaomi TV Box S 2e génération et Sony Bravia KD-55XF9005**, avec détection de la nouvelle version, téléchargement, installation, redémarrage, HOME opérationnel et conservation des favoris et de tous les paramètres. La nouvelle numérotation publique fonctionne donc avec un `versionCode` Android croissant. Résultats limités aux appareils testés.
 
 La mise à jour est possible car le code de version Android augmente de 18 à 19, tandis que l'identifiant `com.gathin.tvhome` et le certificat de signature restent identiques.
 
 ### 🆕 v4.8 — KPI de diagnostic et fiabilité des mises à jour
 
-Version 4.8.0 (versionCode 18). Mesures ponctuelles : RAM propre à TV-Launcher (PSS), temps de préparation de la grille HOME, pression mémoire Android. Fenêtre diagnostic corrigée avec défilement, titre et bouton Fermer visibles ; la mesure thermique expérimentale est supprimée. Correction de la recherche de mises à jour pour les noms de versions RC : utilisation du versionCode Android plutôt que conversion de `-rc` en entier. Tests interface et vérification des mises à jour réalisés sur Sony ; le parcours complet vers une version supérieure et la validation Xiaomi restent à confirmer. Aucun changement de l'accueil ni service résident ajouté.
+Version 4.8.0 (versionCode 18). Mesures ponctuelles : RAM propre à TV-Launcher (PSS), temps de préparation de la grille HOME, pression mémoire Android. Fenêtre diagnostic corrigée avec défilement, titre et bouton Fermer visibles ; la mesure thermique expérimentale est supprimée. Correction de la recherche de mises à jour pour les noms de versions RC : utilisation du versionCode Android plutôt que conversion de `-rc` en entier. Tests de migration **v4.6 → v4.8** ensuite confirmés sur Sony et Xiaomi, avec conservation de la configuration. Aucun changement de l'accueil ni service résident ajouté.
 
 ### 🛠 v4.7.1 — correctif des signatures Android TV
 
