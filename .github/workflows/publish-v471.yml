@@ -1,0 +1,108 @@
+name: Publish TV-Launcher Min v4.7.1
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-v471.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-tv-launcher-4.7.1
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: release-signing
+    timeout-minutes: 30
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+      - name: Configure Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Configure Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+      - name: Install Android SDK 34
+        run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
+      - name: Check release is not already published
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view 4.7.1 --repo vincent-deprato/tv-launcher-min >/dev/null 2>&1; then
+            echo "Release 4.7.1 already exists; refusing to overwrite it."
+            exit 1
+          fi
+      - name: Restore release-signing credentials
+        shell: bash
+        env:
+          KEYSTORE_BASE64: ${{ secrets.TV_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.TV_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.TV_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.TV_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$KEYSTORE_BASE64" && test -n "$STORE_PASSWORD"
+          test -n "$KEY_ALIAS" && test -n "$KEY_PASSWORD"
+          umask 077
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/tv-launcher-release.jks"
+          {
+            printf 'storeFile=%s\n' "$RUNNER_TEMP/tv-launcher-release.jks"
+            printf 'storePassword=%s\n' "$STORE_PASSWORD"
+            printf 'keyAlias=%s\n' "$KEY_ALIAS"
+            printf 'keyPassword=%s\n' "$KEY_PASSWORD"
+          } > launcher/signing.properties
+      - name: Test and compile signed v4.7
+        working-directory: launcher
+        run: bash ./gradlew --no-daemon --console=plain testDebugUnitTest assembleRelease
+      - name: Verify package version and same release signing key
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="launcher/app/build/outputs/apk/release/tv-launcher.apk"
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose "$APK"
+          ACTUAL=$("$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --print-certs "$APK" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
+          EXPECTED="8fe6773542f4b40c7a43f06a28989ab73841c0413741c16131ef9472d57fe4ae"
+          test "$ACTUAL" = "$EXPECTED" || { echo "Release signing certificate mismatch"; exit 1; }
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" | grep -E "^package: name='com.gathin.tvhome' versionCode='15' versionName='4.7.1'"
+          sha256sum "$APK"
+      - name: Publish stable v4.7.1
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/release-notes.md" <<'NOTES'
+          Android-VersionCode: 15
+
+          ## TV-Launcher Min v4.7.1
+
+          **Correctif de la vérification des signatures pour les mises à jour sur Android TV.**
+
+          - Vérification de signature améliorée lorsque certains firmwares ne fournissent pas les certificats du fichier APK par l'API moderne.
+          - Repli sur les informations de signature historiques lorsque nécessaire ; refus maintenu si les certificats sont absents ou différents.
+          - Aucune modification visuelle ni de préférences ; mise à jour depuis la RC1 (versionCode 14) vers cette version (versionCode 15).
+          - Test complet de l'updater sur Sony à valider après publication.
+          - Conserve l'identifiant Android, les préférences et le certificat des versions précédentes.
+
+          Le projet reste volontairement compact : 8 fichiers et 2 190 lignes Java contre 49 fichiers et 10 837 lignes sur la branche main de CleanYourTV consultée en octobre 2026. Cela compare le code source, pas les performances mesurées.
+          NOTES
+          gh release create 4.7.1 "launcher/app/build/outputs/apk/release/tv-launcher.apk#tv-launcher.apk" \
+            --repo vincent-deprato/tv-launcher-min \
+            --target main \
+            --title "TV-Launcher Min v4.7.1" \
+            --notes-file "$RUNNER_TEMP/release-notes.md" \
+            --latest
+      - name: Remove temporary signing credentials
+        if: always()
+        shell: bash
+        run: rm -f launcher/signing.properties "$RUNNER_TEMP/tv-launcher-release.jks"

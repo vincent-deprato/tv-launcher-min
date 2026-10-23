@@ -1,5 +1,9 @@
 # Historique des versions / Release history
 
+### 🛠 v4.7.1 — correctif des signatures Android TV
+
+Correction de la lecture des certificats lors du téléchargement d'une mise à jour sur certains firmwares Android TV. Quand l'API moderne ne renvoie aucune signature, TV-Launcher tente une lecture de compatibilité ; l'installation reste bloquée si les signatures diffèrent ou sont illisibles. Aucun changement visuel. **VersionCode 15**, supérieur à la RC1 (14), pour valider le parcours de mise à jour intégré sur Sony Bravia.
+
 ### 🆕 v4.7 — optimisation interne, sans changement d'interface
 
 **v4.7.0 (versionCode 13)**, validée sur les appareils de test selon le retour utilisateur. Cette version améliore le tri interne de la liste des applications en construisant une seule fois les index des favoris et de l'ordre personnalisé par rafraîchissement, et évite la programmation multiple du rafraîchissement périodique lors du retour à HOME. Les instructions de contribution ont été recentrées sur TV-Launcher Min et une ancienne notice locale v4.0 a été retirée.
