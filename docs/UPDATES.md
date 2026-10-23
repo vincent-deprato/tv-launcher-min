@@ -6,7 +6,7 @@ Les versions 4.2.0 à 4.8.0 forment l'historique de développement. La première
 
 La vérification intégrée utilise le `versionCode` fourni dans les notes de la dernière Release GitHub stable (`Android-VersionCode: 19`), pas l'ordre des libellés 4.8 et 1.0.0. La Release 1.0.0 doit être explicitement marquée **Latest** pour l'API `releases/latest`.
 
-**Recette réalisée le 23 octobre 2026 :** mise à jour **4.6 → 4.8 réussie sur Sony et Xiaomi**, favoris et autres paramètres conservés. Sur Sony, Android a demandé l'autorisation d'installer des APK avant de poursuivre. **À tester après publication :** migration **4.8 → 1.0.0**, détection « à jour », conservation des réglages et fonctionnement de HOME.
+**Recette réalisée le 23 octobre 2026 :** mise à jour **4.6 → 4.8 réussie sur Sony et Xiaomi**, favoris et autres paramètres conservés. Sur Sony, Android a demandé l'autorisation d'installer des APK avant de poursuivre. **Recette finale réalisée le 24 octobre 2026 :** migration **4.8 → 1.0.0 réussie sur Xiaomi TV Box S 2e génération et Sony Bravia KD-55XF9005** via le menu de mise à jour intégré. Détection de la nouvelle version, téléchargement, installation, redémarrage et HOME fonctionnent ; **favoris et ensemble des paramètres conservés**. Cette validation couvre les appareils testés, et non tous les firmwares.
 
 Les mises à jour suivantes utiliseront `1.0.1` avec un `versionCode` strictement supérieur à 19, sans changement d'ID Android ni de certificat de signature.
 
