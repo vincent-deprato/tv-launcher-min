@@ -40,12 +40,12 @@
 | Scénario de mise à jour | Xiaomi TV Box S 2e génération | Sony Bravia KD-55XF9005 |
 |---|---|---|
 | **4.6 → 4.8** via le menu intégré | ✅ Validé | ✅ Validé |
-| **4.8 → 1.0.0** : détection de version | ✅ Validé le 24 octobre 2026 | ⏳ À confirmer |
-| **4.8 → 1.0.0** : téléchargement et installation | ✅ Validé le 24 octobre 2026 | ⏳ À confirmer |
-| **4.8 → 1.0.0** : redémarrage et fonctionnement de HOME | ✅ Validé le 24 octobre 2026 | ⏳ À confirmer |
-| **4.8 → 1.0.0** : conservation des favoris et paramètres | ✅ Validé le 24 octobre 2026 | ⏳ À confirmer |
+| **4.8 → 1.0.0** : détection de version | ✅ Validé le 24 octobre 2026 | ✅ Validé le 24 octobre 2026 |
+| **4.8 → 1.0.0** : téléchargement et installation | ✅ Validé le 24 octobre 2026 | ✅ Validé le 24 octobre 2026 |
+| **4.8 → 1.0.0** : redémarrage et fonctionnement de HOME | ✅ Validé le 24 octobre 2026 | ✅ Validé le 24 octobre 2026 |
+| **4.8 → 1.0.0** : conservation des favoris et paramètres | ✅ Validé le 24 octobre 2026 | ✅ Validé le 24 octobre 2026 |
 
-Les favoris et l'ensemble des paramètres avaient également été conservés lors de la mise à jour **4.6 → 4.8** sur les deux appareils. Sur Sony, Android avait demandé d'autoriser l'application installatrice à installer des APK avant de poursuivre. La **migration 4.8 → 1.0.0 est désormais validée de bout en bout sur Xiaomi**, sans désinstallation ni perte de configuration.
+Les favoris et l'ensemble des paramètres avaient également été conservés lors de la mise à jour **4.6 → 4.8** sur les deux appareils. Sur Sony, Android avait demandé d'autoriser l'application installatrice à installer des APK avant de poursuivre. La **migration 4.8 → 1.0.0 est désormais validée de bout en bout sur les deux appareils (Xiaomi et Sony)**, sans désinstallation ni perte de configuration. Les favoris, les paramètres et la fonction HOME restent opérationnels après installation.
 
 ### Un launcher plus léger que le projet d'origine
 
@@ -68,7 +68,7 @@ TV-Launcher Min offers a **clean, remote-friendly home screen**, editable favour
 
 [Installation guide](docs/INSTALLATION.md) · [Device compatibility and Xiaomi precautions](docs/XIAOMI-BOX-S-2ND-GEN.md)
 
-**Update validation (24 October 2026):** the in-app upgrade **4.8 → 1.0.0** was successfully tested on the **Xiaomi TV Box S (2nd gen)**: version detection, download, installation, successful restart, working HOME, and preserved favourites and settings. The **Sony Bravia 4.8 → 1.0.0** upgrade is not yet verified; both devices previously passed 4.6 → 4.8 with settings preserved.
+**Update validation (24 October 2026):** the in-app upgrade **4.8 → 1.0.0** was successfully tested on **both the Xiaomi TV Box S (2nd gen) and Sony Bravia KD-55XF9005**: version detection, download, installation, successful restart, working HOME, and preserved favourites and settings. Both devices previously passed 4.6 → 4.8 with settings preserved. These results apply to the devices tested, not every firmware.
 
 **v4.7:** internal app-list sorting and lifecycle callback optimizations, plus repository cleanup; no new interface features. Source comparison with CleanYourTV: 8 vs 49 Java files and 2,190 vs 10,837 Java source lines (−79.8%). This is not a measured RAM reduction.
 
