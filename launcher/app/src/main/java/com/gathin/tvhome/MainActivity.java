@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.os.Environment;
 import android.os.StatFs;
+import android.os.SystemClock;
 import android.text.format.Formatter;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -34,6 +35,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.view.WindowManager;
 import android.graphics.Typeface;
 import android.widget.ImageView;
@@ -85,6 +87,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     /** App of the last focused tile, so focus follows it when the app list changes. */
     private static String lastFocusedKey;
     private float density;
+    /** Last synchronous application-list refresh; not an end-to-end screen-render metric. */
+    private long lastHomePreparationMs = -1;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     /** Refreshes the network pill when the connection changes: at boot Wi-Fi often connects after Home is shown. */
@@ -222,6 +226,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         if (manager == null) return;
         ActivityManager.MemoryInfo memory = new ActivityManager.MemoryInfo();
         manager.getMemoryInfo(memory);
+        DiagnosticSampler.Snapshot snapshot = DiagnosticSampler.sample(this, memory);
         StatFs disk = new StatFs(Environment.getDataDirectory().getAbsolutePath());
 
         long ramTotal = memory.totalMem;
@@ -315,13 +320,37 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         status.setPadding(0, 0, 0, pad / 2);
         content.addView(status);
 
+        TextView kpiTitle = new TextView(this);
+        kpiTitle.setText("Performances TV-Launcher");
+        kpiTitle.setTextColor(Color.WHITE);
+        kpiTitle.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        kpiTitle.setTextSize(17);
+        kpiTitle.setPadding(0, pad / 2, 0, pad / 2);
+        content.addView(kpiTitle);
+
+        addDiagnosticDetail(content, "RAM de l'application : "
+                + (snapshot.pssKb >= 0
+                    ? Formatter.formatShortFileSize(this, snapshot.pssKb * 1024L) + " PSS"
+                    : "Indisponible"), pad);
+        addDiagnosticDetail(content, "Préparation liste HOME : "
+                + (lastHomePreparationMs >= 0
+                    ? lastHomePreparationMs + " ms (dernier retour)"
+                    : "Non encore mesurée"), pad);
+        addDiagnosticDetail(content, "Pression mémoire Android : "
+                + (snapshot.lowMemory ? "Mémoire faible" : "Normale"), pad);
+        addDiagnosticDetail(content, "État thermique : "
+                + DiagnosticSampler.thermalLabel(snapshot.thermalStatus), pad);
+
         TextView note = new TextView(this);
         note.setText("CPU : mesure ponctuelle, pas de surveillance permanente.");
         note.setTextColor(0xFF9EB6D1);
         note.setTextSize(12);
         content.addView(note);
 
-        AlertDialog dialog = new AlertDialog.Builder(this).setView(content)
+        ScrollView scroll = new ScrollView(this);
+        scroll.setFillViewport(false);
+        scroll.addView(content);
+        AlertDialog dialog = new AlertDialog.Builder(this).setView(scroll)
                 .setPositiveButton("Fermer", null).create();
         dialog.setOnShowListener(ignored -> {
             if (dialog.getWindow() != null) {
@@ -330,6 +359,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                 dialog.getWindow().setLayout(Math.min(Math.round(480 * getResources().getDisplayMetrics().density),
                         width - 2 * pad), WindowManager.LayoutParams.WRAP_CONTENT);
                 dialog.getWindow().setDimAmount(0.72f);
+                dialog.getWindow().setLayout(Math.min(Math.round(480 * getResources().getDisplayMetrics().density),
+                        width - 2 * pad), Math.min(Math.round(700 * getResources().getDisplayMetrics().density),
+                        getResources().getDisplayMetrics().heightPixels - 2 * pad));
                 dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
             }
             android.widget.Button close = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
@@ -344,6 +376,15 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             }
         });
         dialog.show();
+    }
+
+    private void addDiagnosticDetail(LinearLayout parent, String value, int pad) {
+        TextView detail = new TextView(this);
+        detail.setText(value);
+        detail.setTextColor(0xFFD0DEF0);
+        detail.setTextSize(14);
+        detail.setPadding(0, 0, 0, pad / 3);
+        parent.addView(detail);
     }
 
     private void addDiagnosticBar(LinearLayout content, String label, long used, long total, int accent) {
@@ -388,7 +429,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         // Read these before reload(): rebinding can move focus to the first tile and overwrite them.
         final String returnKey = lastFocusedKey;
         final int returnSlot = lastFocused;
+        long reloadStart = SystemClock.elapsedRealtimeNanos();
         adapter.reload();
+        lastHomePreparationMs = (SystemClock.elapsedRealtimeNanos() - reloadStart) / 1_000_000L;
         grid.scheduleLayoutAnimation();
         updateGreeting();
         updateWifiLabel();
