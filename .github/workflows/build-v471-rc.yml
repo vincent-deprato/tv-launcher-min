@@ -61,7 +61,7 @@ jobs:
           ACTUAL=$("$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --print-certs "$APK" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
           EXPECTED="8fe6773542f4b40c7a43f06a28989ab73841c0413741c16131ef9472d57fe4ae"
           test "$ACTUAL" = "$EXPECTED" || { echo "Unexpected signing certificate"; exit 1; }
-          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" | grep -E "^package: name='com.gathin.tvhome' versionCode='14' versionName='4.7-rc1'"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" | grep -E "^package: name='com.gathin.tvhome' versionCode='14' versionName='4.7.1-rc1'"
           sha256sum "$APK"
       - name: Upload v4.7.1 RC test APK
         uses: actions/upload-artifact@v4
