@@ -1,5 +1,9 @@
 # Historique des versions / Release history
 
+### 🆕 v4.8 — KPI de diagnostic et fiabilité des mises à jour
+
+Version 4.8.0 (versionCode 18). Mesures ponctuelles : RAM propre à TV-Launcher (PSS), temps de préparation de la grille HOME, pression mémoire Android. Fenêtre diagnostic corrigée avec défilement, titre et bouton Fermer visibles ; la mesure thermique expérimentale est supprimée. Correction de la recherche de mises à jour pour les noms de versions RC : utilisation du versionCode Android plutôt que conversion de `-rc` en entier. Tests interface et vérification des mises à jour réalisés sur Sony ; le parcours complet vers une version supérieure et la validation Xiaomi restent à confirmer. Aucun changement de l'accueil ni service résident ajouté.
+
 ### 🛠 v4.7.1 — correctif des signatures Android TV
 
 Correction de la lecture des certificats lors du téléchargement d'une mise à jour sur certains firmwares Android TV. Quand l'API moderne ne renvoie aucune signature, TV-Launcher tente une lecture de compatibilité ; l'installation reste bloquée si les signatures diffèrent ou sont illisibles. Aucun changement visuel. **VersionCode 15**, supérieur à la RC1 (14), pour valider le parcours de mise à jour intégré sur Sony Bravia.
