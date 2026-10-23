@@ -290,15 +290,40 @@ final class UpdateManager {
             throw new Exception("Version Android incompatible");
         Signature[] expected = signatures(installed);
         Signature[] actual = signatures(candidate);
-        if (expected.length == 0 || !Arrays.equals(expected, actual))
+        // Some Android TV firmwares provide no signingInfo for an APK archive even
+        // when GET_SIGNING_CERTIFICATES was requested. Retry using legacy signatures
+        // rather than reporting an incorrect certificate mismatch.
+        if (expected.length == 0 || actual.length == 0) {
+            PackageInfo fallbackCandidate = pm.getPackageArchiveInfo(
+                    apk.getAbsolutePath(), PackageManager.GET_SIGNATURES);
+            PackageInfo fallbackInstalled = pm.getPackageInfo(
+                    activity.getPackageName(), PackageManager.GET_SIGNATURES);
+            if (expected.length == 0) expected = signatures(fallbackInstalled);
+            if (actual.length == 0) actual = signatures(fallbackCandidate);
+        }
+        if (expected.length == 0 || actual.length == 0)
+            throw new Exception("Signature APK non lisible sur cet appareil (vérification impossible)");
+        if (!sameSigners(expected, actual))
             throw new Exception("Signature APK différente de la version installée");
     }
 
+    /** Signer array ordering does not establish certificate identity. */
+    private static boolean sameSigners(Signature[] expected, Signature[] actual) {
+        if (expected.length != actual.length) return false;
+        java.util.List<Signature> remaining = new java.util.ArrayList<>(Arrays.asList(actual));
+        for (Signature signature : expected) {
+            if (!remaining.remove(signature)) return false;
+        }
+        return remaining.isEmpty();
+    }
+
     private Signature[] signatures(PackageInfo info) {
+        if (info == null) return new Signature[0];
         if (Build.VERSION.SDK_INT >= 28 && info.signingInfo != null) {
-            return info.signingInfo.hasMultipleSigners()
+            Signature[] signing = info.signingInfo.hasMultipleSigners()
                     ? info.signingInfo.getApkContentsSigners()
                     : info.signingInfo.getSigningCertificateHistory();
+            if (signing != null && signing.length > 0) return signing;
         }
         return info.signatures == null ? new Signature[0] : info.signatures;
     }
