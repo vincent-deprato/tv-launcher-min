@@ -127,15 +127,16 @@ final class UpdateManager {
             if (release.optBoolean("draft", true) || release.optBoolean("prerelease", true)) return null;
             String tag = release.optString("tag_name", "").replaceFirst("^v", "");
             if (!tag.matches("[0-9]+\\.[0-9]+(\\.[0-9]+)?")) throw new Exception("Version GitHub invalide");
-            // Older releases predate the updater metadata contract; show "up to date" instead of an error.
-            if (compareVersionNames(tag, BuildConfig.VERSION_NAME) <= 0) return null;
-            // Android versionCode is authoritative. Read it from official release metadata, never guess
-            // from the human-readable tag.
+            // Compare Android versionCode, not the human-readable versionName: test builds
+            // can have names like 4.7.1-rc1 that cannot be parsed as dotted integers.
+            // Android versionCode is authoritative. Read it from official release metadata,
+            // never guess from the human-readable tag.
             String body = release.optString("body", "");
             java.util.regex.Matcher codeMatch = java.util.regex.Pattern
                     .compile("(?im)^\\s*Android-VersionCode:\\s*(\\d+)\\s*$").matcher(body);
             if (!codeMatch.find()) throw new Exception("La Release ne précise pas Android-VersionCode");
             int code = Integer.parseInt(codeMatch.group(1));
+            if (code <= BuildConfig.VERSION_CODE) return null;
             JSONArray assets = release.optJSONArray("assets");
             if (assets == null) throw new Exception("APK absent");
             for (int i = 0; i < assets.length(); i++) {
@@ -153,17 +154,6 @@ final class UpdateManager {
             }
             throw new Exception("tv-launcher.apk introuvable");
         } finally { conn.disconnect(); }
-    }
-
-    private static int compareVersionNames(String one, String two) {
-        String[] a = one.split("\\.");
-        String[] b = two.split("\\.");
-        for (int i = 0; i < 3; i++) {
-            int ai = i < a.length ? Integer.parseInt(a[i]) : 0;
-            int bi = i < b.length ? Integer.parseInt(b[i]) : 0;
-            if (ai != bi) return Integer.compare(ai, bi);
-        }
-        return 0;
     }
 
     private JSONObject readJson(InputStream in) throws Exception {
