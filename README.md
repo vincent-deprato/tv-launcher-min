@@ -3,9 +3,9 @@
 **Un écran d'accueil Android TV / Google TV léger, personnalisable et pensé pour la télécommande.**  
 *A lightweight, customizable launcher for Android TV & Google TV.*
 
-**Version stable : v4.7.0 · Android 8.0+**
+**Version stable : v4.7.1 · Android 8.0+**
 
-[**⬇️ Télécharger l'APK v4.7.0 / Download APK**](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.7.0/tv-launcher.apk) · [Toutes les versions / Releases](https://github.com/vincent-deprato/tv-launcher-min/releases)
+[**⬇️ Télécharger l'APK v4.7.1 / Download APK**](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.7.1/tv-launcher.apk) · [Toutes les versions / Releases](https://github.com/vincent-deprato/tv-launcher-min/releases)
 
 ![TV-Launcher Min — accueil Sony Bravia, capture v4.2](docs/images/tv-launcher-sony.png)
 
