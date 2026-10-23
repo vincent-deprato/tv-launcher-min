@@ -1,0 +1,113 @@
+name: Publish TV-Launcher Min v1.0.0
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-tv-launcher-1.0.0
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: release-signing
+    timeout-minutes: 30
+    steps:
+      - name: Checkout tagged source
+        uses: actions/checkout@v4
+      - name: Configure Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Configure Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+      - name: Install Android SDK 34
+        run: sdkmanager "platforms;android-34" "build-tools;34.0.0"
+      - name: Ensure release tag does not already exist
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view 1.0.0 --repo vincent-deprato/tv-launcher-min >/dev/null 2>&1; then
+            echo "Release 1.0.0 already exists; refusing to overwrite it."
+            exit 1
+          fi
+      - name: Restore existing release-signing credentials
+        shell: bash
+        env:
+          KEYSTORE_BASE64: ${{ secrets.TV_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.TV_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.TV_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.TV_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          test -n "$KEYSTORE_BASE64" && test -n "$STORE_PASSWORD"
+          test -n "$KEY_ALIAS" && test -n "$KEY_PASSWORD"
+          umask 077
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/tv-launcher-release.jks"
+          {
+            printf 'storeFile=%s\n' "$RUNNER_TEMP/tv-launcher-release.jks"
+            printf 'storePassword=%s\n' "$STORE_PASSWORD"
+            printf 'keyAlias=%s\n' "$KEY_ALIAS"
+            printf 'keyPassword=%s\n' "$KEY_PASSWORD"
+          } > launcher/signing.properties
+      - name: Unit tests and signed release build
+        working-directory: launcher
+        run: bash ./gradlew --no-daemon --console=plain testDebugUnitTest assembleRelease
+      - name: Verify identity, version and original release certificate
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="launcher/app/build/outputs/apk/release/tv-launcher.apk"
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose "$APK"
+          ACTUAL=$("$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --print-certs "$APK" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
+          EXPECTED="8fe6773542f4b40c7a43f06a28989ab73841c0413741c16131ef9472d57fe4ae"
+          test "$ACTUAL" = "$EXPECTED" || { echo "Release signing certificate mismatch"; exit 1; }
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" | grep -E "^package: name='com.gathin.tvhome' versionCode='19' versionName='1.0.0'"
+          sha256sum "$APK"
+      - name: Publish first stable release and mark it Latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -qx 'Android-VersionCode: 19' RELEASE_NOTES_v1.0.0.md
+          gh release create 1.0.0 "launcher/app/build/outputs/apk/release/tv-launcher.apk#tv-launcher.apk" \
+            --repo vincent-deprato/tv-launcher-min \
+            --target "$GITHUB_SHA" \
+            --title "TV-Launcher Min v1.0.0 — Première version stable" \
+            --notes-file RELEASE_NOTES_v1.0.0.md \
+            --latest
+      - name: Reclassify historical development releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          for tag in 4.2.0 4.3.0 4.4.0 4.5.0 4.6.0 4.7.0 4.7.1 4.8.0; do
+            gh release edit "$tag" --repo vincent-deprato/tv-launcher-min --prerelease || \
+              echo "::warning::Unable to reclassify $tag; edit its prerelease status manually."
+          done
+      - name: Confirm latest is v1.0.0 with the expected APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(gh api repos/vincent-deprato/tv-launcher-min/releases/latest --jq '.tag_name')" = "1.0.0"
+          gh release view 1.0.0 --repo vincent-deprato/tv-launcher-min --json assets --jq '.assets[].name' | grep -qx 'tv-launcher.apk'
+      - name: Remove temporary signing credentials
+        if: always()
+        shell: bash
+        run: rm -f launcher/signing.properties "$RUNNER_TEMP/tv-launcher-release.jks"

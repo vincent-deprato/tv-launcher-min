@@ -3,9 +3,11 @@
 **Un écran d'accueil Android TV / Google TV léger, personnalisable et pensé pour la télécommande.**  
 *A lightweight, customizable launcher for Android TV & Google TV.*
 
-**Version stable : v4.8.0 · Android 8.0+**
+**Première version stable : v1.0.0 · Android 8.0+**
 
-[**⬇️ Télécharger l'APK v4.8.0 / Download APK**](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.8.0/tv-launcher.apk) · [Toutes les versions / Releases](https://github.com/vincent-deprato/tv-launcher-min/releases)
+[**⬇️ Télécharger l'APK v1.0.0 / Download APK**](https://github.com/vincent-deprato/tv-launcher-min/releases/latest/download/tv-launcher.apk) · [Toutes les versions / Releases](https://github.com/vincent-deprato/tv-launcher-min/releases)
+
+> **Historique :** les versions 4.2.0 à 4.8.0 étaient des versions de développement et de validation. La version **1.0.0** inaugure la numérotation publique stable. Le nom de version repart à 1.0.0, mais le `versionCode` Android continue d'augmenter (19 après 18) afin de préserver les mises à jour et les paramètres.
 
 ![TV-Launcher Min — accueil Sony Bravia, capture v4.2](docs/images/tv-launcher-sony.png)
 
@@ -33,7 +35,7 @@
 
 ### Appareils testés
 
-**Sony Bravia KD-55XF9005** (Android TV) et **Xiaomi TV Box S 2e génération** (Google TV 11, firmware 773). Sur Xiaomi, la mise à jour intégrée v4.5 → v4.6, le diagnostic CPU et la persistance de HOME après redémarrage ont été validés. **Tous les tests prévus sur Sony Bravia ont également été confirmés réussis**, y compris le parcours d'installation et d'autorisation sans ADB. Ces validations portent sur les appareils testés, pas sur tous les firmwares.
+**Sony Bravia KD-55XF9005** (Android TV) et **Xiaomi TV Box S 2e génération** (Google TV 11, firmware 773). La mise à jour intégrée **v4.6 → v4.8 a été validée sur les deux appareils**, avec conservation des favoris et de tous les paramètres. Sur Sony, Android a demandé l'autorisation d'installation des APK à la première mise à jour. Le passage **v4.8 → v1.0.0** est à confirmer après publication. Ces validations portent sur les appareils testés, pas sur tous les firmwares.
 
 ### Un launcher plus léger que le projet d'origine
 
