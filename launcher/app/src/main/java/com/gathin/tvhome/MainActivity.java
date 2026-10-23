@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.os.Environment;
 import android.os.StatFs;
+import android.os.SystemClock;
 import android.text.format.Formatter;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -34,6 +35,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.view.WindowManager;
 import android.graphics.Typeface;
 import android.widget.ImageView;
@@ -85,6 +87,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     /** App of the last focused tile, so focus follows it when the app list changes. */
     private static String lastFocusedKey;
     private float density;
+    // Measured through the UI traversal requested after preparing the HOME grid.
+    private long lastHomePreparationMs = -1;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     /** Refreshes the network pill when the connection changes: at boot Wi-Fi often connects after Home is shown. */
@@ -315,13 +319,28 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         status.setPadding(0, 0, 0, pad / 2);
         content.addView(status);
 
+        // Additional diagnostics are measured only when this dialog is opened.
+        // Keep the original RAM/CPU/disk bars and avoid any resident sampling.
+        DiagnosticSampler.Snapshot extra = DiagnosticSampler.measure(this, memory);
+        addDiagnosticLine(content, "RAM TV-Launcher", extra.pssBytes >= 0
+                ? Formatter.formatShortFileSize(this, extra.pssBytes) + " PSS"
+                : "Indisponible");
+        addDiagnosticLine(content, "Préparation HOME (dernier retour)", lastHomePreparationMs >= 0
+                ? lastHomePreparationMs + " ms (jusqu'au traitement UI programmé)"
+                : "Non mesurée");
+        addDiagnosticLine(content, "Pression mémoire", extra.memoryPressure);
+        addDiagnosticLine(content, "État thermique Android", extra.thermalStatus);
+
         TextView note = new TextView(this);
         note.setText("CPU : mesure ponctuelle, pas de surveillance permanente.");
         note.setTextColor(0xFF9EB6D1);
         note.setTextSize(12);
         content.addView(note);
 
-        AlertDialog dialog = new AlertDialog.Builder(this).setView(content)
+        ScrollView scroll = new ScrollView(this);
+        scroll.setFillViewport(false);
+        scroll.addView(content);
+        AlertDialog dialog = new AlertDialog.Builder(this).setView(scroll)
                 .setPositiveButton("Fermer", null).create();
         dialog.setOnShowListener(ignored -> {
             if (dialog.getWindow() != null) {
@@ -330,6 +349,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                 dialog.getWindow().setLayout(Math.min(Math.round(480 * getResources().getDisplayMetrics().density),
                         width - 2 * pad), WindowManager.LayoutParams.WRAP_CONTENT);
                 dialog.getWindow().setDimAmount(0.72f);
+                scroll.getLayoutParams().height = Math.min(
+                        Math.round(getResources().getDisplayMetrics().heightPixels * 0.72f),
+                        scroll.getMeasuredHeight());
                 dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
             }
             android.widget.Button close = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
@@ -344,6 +366,15 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             }
         });
         dialog.show();
+    }
+
+    private void addDiagnosticLine(LinearLayout content, String name, String value) {
+        TextView line = new TextView(this);
+        line.setText(name + " : " + value);
+        line.setTextColor(0xFFD0DEF0);
+        line.setTextSize(14);
+        line.setPadding(0, 0, 0, Math.round(8 * getResources().getDisplayMetrics().density));
+        content.addView(line);
     }
 
     private void addDiagnosticBar(LinearLayout content, String label, long used, long total, int accent) {
@@ -388,6 +419,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         // Read these before reload(): rebinding can move focus to the first tile and overwrite them.
         final String returnKey = lastFocusedKey;
         final int returnSlot = lastFocused;
+        final long homePreparationStart = SystemClock.elapsedRealtimeNanos();
         adapter.reload();
         grid.scheduleLayoutAnimation();
         updateGreeting();
@@ -399,6 +431,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         // Return to the app we left from, or the same slot if that app is gone. Always refocus: after
         // reload() the view that holds focus may no longer show the app it had.
         grid.post(() -> {
+            lastHomePreparationMs = Math.max(0L, (SystemClock.elapsedRealtimeNanos()
+                    - homePreparationStart) / 1_000_000L);
             int pos = adapter.positionOf(returnKey);
             focusTile(pos >= 0 ? pos : returnSlot);
         });
