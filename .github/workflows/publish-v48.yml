@@ -60,7 +60,7 @@ jobs:
             printf 'keyAlias=%s\n' "$KEY_ALIAS"
             printf 'keyPassword=%s\n' "$KEY_PASSWORD"
           } > launcher/signing.properties
-      - name: Test and compile signed v4.7
+      - name: Test and compile signed v4.8
         working-directory: launcher
         run: bash ./gradlew --no-daemon --console=plain testDebugUnitTest assembleRelease
       - name: Verify package version and same release signing key
