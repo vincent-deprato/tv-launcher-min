@@ -2,9 +2,9 @@ name: Build signed TV-Launcher v4.7.1 RC
 
 on:
   push:
-    branches: [feature/v4.7.1-rc1]
+    branches: [release/v4.7.1-rc1]
     paths:
-      - '.github/workflows/build-v47-rc.yml'
+      - '.github/workflows/build-v471-rc.yml'
       - 'launcher/**'
   workflow_dispatch:
 
