@@ -338,8 +338,6 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                     : "Non encore mesurée"), pad);
         addDiagnosticDetail(content, "Pression mémoire Android : "
                 + (snapshot.lowMemory ? "Mémoire faible" : "Normale"), pad);
-        addDiagnosticDetail(content, "État thermique : "
-                + DiagnosticSampler.thermalLabel(snapshot.thermalStatus), pad);
 
         TextView note = new TextView(this);
         note.setText("CPU : mesure ponctuelle, pas de surveillance permanente.");
@@ -347,21 +345,30 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         note.setTextSize(12);
         content.addView(note);
 
+        // Keep a fixed title and closing action; only the measures scroll.
+        content.removeView(heading);
+        LinearLayout dialogBody = new LinearLayout(this);
+        dialogBody.setOrientation(LinearLayout.VERTICAL);
+        dialogBody.setPadding(pad / 2, pad / 2, pad / 2, 0);
+        dialogBody.addView(heading);
         ScrollView scroll = new ScrollView(this);
         scroll.setFillViewport(false);
+        scroll.setVerticalScrollBarEnabled(true);
+        scroll.setFocusable(true);
         scroll.addView(content);
-        AlertDialog dialog = new AlertDialog.Builder(this).setView(scroll)
+        dialogBody.addView(scroll, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
+        AlertDialog dialog = new AlertDialog.Builder(this).setView(dialogBody)
                 .setPositiveButton("Fermer", null).create();
         dialog.setOnShowListener(ignored -> {
             if (dialog.getWindow() != null) {
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0xFF1D293A));
                 int width = getResources().getDisplayMetrics().widthPixels;
+                int height = getResources().getDisplayMetrics().heightPixels;
                 dialog.getWindow().setLayout(Math.min(Math.round(480 * getResources().getDisplayMetrics().density),
-                        width - 2 * pad), WindowManager.LayoutParams.WRAP_CONTENT);
+                        width - 2 * pad), Math.min(Math.round(640 * getResources().getDisplayMetrics().density),
+                        height - 2 * pad));
                 dialog.getWindow().setDimAmount(0.72f);
-                dialog.getWindow().setLayout(Math.min(Math.round(480 * getResources().getDisplayMetrics().density),
-                        width - 2 * pad), Math.min(Math.round(700 * getResources().getDisplayMetrics().density),
-                        getResources().getDisplayMetrics().heightPixels - 2 * pad));
                 dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
             }
             android.widget.Button close = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
