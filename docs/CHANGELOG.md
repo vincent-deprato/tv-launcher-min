@@ -1,5 +1,11 @@
 # Historique des versions / Release history
 
+### 🆕 v4.7 — optimisation interne, sans changement d'interface
+
+**v4.7.0 (versionCode 13)**, validée sur les appareils de test selon le retour utilisateur. Cette version améliore le tri interne de la liste des applications en construisant une seule fois les index des favoris et de l'ordre personnalisé par rafraîchissement, et évite la programmation multiple du rafraîchissement périodique lors du retour à HOME. Les instructions de contribution ont été recentrées sur TV-Launcher Min et une ancienne notice locale v4.0 a été retirée.
+
+Les favoris, l'affichage, la navigation à la télécommande, le diagnostic et les mises à jour restent inchangés. **Aucun gain de RAM, CPU ou de temps de démarrage n'est revendiqué sans mesures comparatives**. La comparaison de volume avec CleanYourTV figure dans le [README](../README.md).
+
 ### 🆕 v4.6 — autorisations Android et diagnostic CPU
 
 La v4.6.0 améliore le parcours d'autorisation d'installation sur Google TV avec des choix explicites pour ouvrir les paramètres ou tenter l'installateur Android. Certains firmwares peuvent toujours nécessiter ADB. Le diagnostic CPU affiche désormais le nombre de cœurs, la durée de mesure et précise si les valeurs concernent l'ensemble du système ou seulement TV-Launcher.
