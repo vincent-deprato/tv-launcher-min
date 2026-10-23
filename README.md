@@ -3,9 +3,9 @@
 **Un écran d'accueil Android TV / Google TV léger, personnalisable et pensé pour la télécommande.**  
 *A lightweight, customizable launcher for Android TV & Google TV.*
 
-**Version stable : v4.6.0 · Android 8.0+**
+**Version stable : v4.7.0 · Android 8.0+**
 
-[**⬇️ Télécharger l'APK v4.6.0 / Download APK**](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.6.0/tv-launcher.apk) · [Toutes les versions / Releases](https://github.com/vincent-deprato/tv-launcher-min/releases)
+[**⬇️ Télécharger l'APK v4.7.0 / Download APK**](https://github.com/vincent-deprato/tv-launcher-min/releases/download/4.7.0/tv-launcher.apk) · [Toutes les versions / Releases](https://github.com/vincent-deprato/tv-launcher-min/releases)
 
 ![TV-Launcher Min — accueil Sony Bravia, capture v4.2](docs/images/tv-launcher-sony.png)
 
@@ -35,6 +35,19 @@
 
 **Sony Bravia KD-55XF9005** (Android TV) et **Xiaomi TV Box S 2e génération** (Google TV 11, firmware 773). Sur Xiaomi, la mise à jour intégrée v4.5 → v4.6, le diagnostic CPU et la persistance de HOME après redémarrage ont été validés. **Tous les tests prévus sur Sony Bravia ont également été confirmés réussis**, y compris le parcours d'installation et d'autorisation sans ADB. Ces validations portent sur les appareils testés, pas sur tous les firmwares.
 
+### Un launcher plus léger que le projet d'origine
+
+TV-Launcher Min est une version recentrée de [CleanYourTV](https://github.com/Gathin23/cleanyourtv), sans flux de recommandations, fond vidéo ni modules décoratifs superflus. Comparaison des **sources GitHub** avec la branche `main` de CleanYourTV consultée en octobre 2026 (pas nécessairement le commit historique de création du fork) :
+
+| Indicateur | CleanYourTV | TV-Launcher Min v4.7 | Réduction |
+|---|---:|---:|---:|
+| Fichiers Java de l'application | 49 | 8 | **−83,7 %** |
+| Lignes Java (avec blancs et commentaires) | 10 837 | 2 190 | **−79,8 %** |
+| Fichiers dans `launcher/` | 177 | 46 | **−74,0 %** |
+| Fichiers du dépôt avant préparation de release | 929 | 159 | **−82,9 %** |
+
+Ces chiffres décrivent la taille du **code source et du dépôt**, et **non** une réduction mesurée de RAM, de CPU ou de taille APK. L'objectif reste un accueil sobre, rapide et contrôlable à la télécommande.
+
 ## 🇬🇧 English
 
 TV-Launcher Min offers a **clean, remote-friendly home screen**, editable favourites, an organized app grid, on-demand RAM/CPU/storage diagnostics, and GitHub-based in-app updates.
@@ -42,6 +55,8 @@ TV-Launcher Min offers a **clean, remote-friendly home screen**, editable favour
 **Quick start:** download the signed APK, install it on your Android TV device, then select it as Home if your device offers that option. **Do not disable the stock launcher without a device-specific recovery plan.**
 
 [Installation guide](docs/INSTALLATION.md) · [Device compatibility and Xiaomi precautions](docs/XIAOMI-BOX-S-2ND-GEN.md)
+
+**v4.7:** internal app-list sorting and lifecycle callback optimizations, plus repository cleanup; no new interface features. Source comparison with CleanYourTV: 8 vs 49 Java files and 2,190 vs 10,837 Java source lines (−79.8%). This is not a measured RAM reduction.
 
 ## 📚 Documentation
 
